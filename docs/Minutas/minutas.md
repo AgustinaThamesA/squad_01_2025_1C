@@ -4,4 +4,7 @@ En esta carpeta se encuentran las distintas minutas de las reuniones con los mie
 Cada reunión con cada miembro está dentro de un archivo distinto. Los archivos están nombrados de la forma `yyyy/mm/dd - Minuta reunión con <miembro>.pdf`
 
 ### Notas privadas de las reuniones
-Si bien las minutas tienen dentro un temario tratado en cada reunión, se tomaron notas adicionales que se encuentran en el directorio `notas` dentro de este mismo directorio
+Si bien las minutas tienen dentro un temario tratado en cada reunión, se tomaron notas adicionales que se encuentran en el directorio `Notas` dentro de este mismo directorio
+
+*Nota: se puede acceder a las notas desde el archivo de cada minuta, entrando entrando al hipervínculo insertado en la
+sección _Temas tratados_ de cada archivo.
