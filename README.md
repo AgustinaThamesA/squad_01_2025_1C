@@ -12,4 +12,4 @@ En la carpeta `docs` se encuentra toda la documentación del proyecto:
 * _Minutas:_ se pueden encontrar todas las minutas de las reuniones con los miembros de la organización PSA (Praxis Systems Argentina)
   *_Notas:_ se pueden encontrar las notas privadas tomadas para cada una de las reuniones con los miembros de PSA, con información adicional a la que aparece en la minuta de cada reunión
 * _Modelo de Dominio:_
-* _Requisitos:_
+* _Requisitos:_ se puede encontrar el análisis de requisitos para la herramienta, junto con la matriz de trazabilidad de los mismos
