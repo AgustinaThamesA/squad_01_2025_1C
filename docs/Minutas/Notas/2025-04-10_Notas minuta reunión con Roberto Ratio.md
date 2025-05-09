@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Preocupaciones del Gerente:
   * Entrada de dinero: facturación a los clientes. Para cada proyecto se registran las horas trabajadas, para luego 
 poder cobrarlas al cliente. Se cobra por horas insumidas, “time and material”. Se quiere poder entrar a un proyecto y 

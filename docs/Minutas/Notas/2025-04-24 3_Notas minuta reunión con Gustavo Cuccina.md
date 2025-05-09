@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Niveles de implementación: es necesario saber para cada producto para cada cliente, qué versión posee. Si es un 
 módulo particular con una configuración especial, se registra. Es necesario tener todo registrado por si ocurre un 
 incidente. Los clientes pueden tener una configuración:

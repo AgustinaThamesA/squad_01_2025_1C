@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Funcionamiento de atención al cliente:
   * Los clientes se comunican e informan su problema. Es necesario conocer qué versión del software tiene el cliente.
   * Es necesario tener un registro de los clientes y los productos que tiene cada uno. Muchas veces los clientes no 

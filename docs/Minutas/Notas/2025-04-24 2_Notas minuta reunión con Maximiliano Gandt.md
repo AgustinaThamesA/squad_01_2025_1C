@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Funcionamiento del área de proyectos: los proyectos tienen tareas y requerimientos. Es necesario registrar qué es lo 
 que se nos está pidiendo, y en base a eso desarrollar el proyecto.
 * Cosas deseadas en el software:

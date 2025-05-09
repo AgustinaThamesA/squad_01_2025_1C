@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Módulos a desarrollar: proyectos y soporte.
   * Se tienen que poder manejar proyectos. Todos los proyectos tienen tareas y gente asignada con roles definidos.
   Tiene que haber una clara visibilización de proyectos atrasados, mientras antes se descubra que un proyecto está 

@@ -5,7 +5,7 @@
 * Lugar: Zoom Meetings
 
 
-### Temas tradados
+### Temas tratados
 * Identificación de usuarios principales y tareas:
   * El CEO compartió su visión visión general sobre los posibles usuarios de la plataforma, aunque aclaró que no posee 
   detalles técnicos ni funcionales
