@@ -13,7 +13,7 @@
 
 La documentación del proyecto se encuentra en la carpeta [`docs`](./docs), organizada en los siguientes apartados:
 
-### [Visión del Módulo](./docs/Vision%20del%20modulo)
+### [Visión del Módulo](./docs/Vision%20del%20Modulo)
 Contiene las descripciones de los módulos que componen el sistema PSA, sus objetivos, funcionalidades clave y alcances definidos para el MVP.
 
 ### [Historias de Dominio](./docs/Historias%20de%20Dominio)
