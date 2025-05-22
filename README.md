@@ -35,7 +35,7 @@ Representación UML del dominio del sistema, con entidades, relaciones y atribut
 Análisis detallado de los requisitos funcionales y no funcionales del sistema, junto con su correspondiente matriz de trazabilidad.
 
 ### [Diagrama de Contexto (C4)](./docs/Diagrama%20de%20Contexto%20C4)
-Diagrama de nivel 1 elaborado según el modelo C4, que ilustra el sistema PSA en su contexto organizacional y tecnológico.
+Diagrama de elaborado según el modelo C4, que ilustra el sistema PSA en su contexto organizacional y tecnológico.
 
 ---
 
