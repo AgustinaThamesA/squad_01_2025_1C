@@ -1,9 +1,9 @@
-package src.main.java.psa.proyectos;
+package src.main.java.psa.modelo;
 
 import java.time.LocalDate;
 
 public class Tarea {
-    private int idTarea;
+    private String idTarea;
     private String titulo;
     private String descripcion;
     private Estado estado;
@@ -12,25 +12,25 @@ public class Tarea {
     private LocalDate fechaFinReal;
     private Prioridad prioridad;
 
-    enum Estado{
+    public enum Estado{
         PLANIFICADA,
         EN_CURSO,
         FINALIZADA
     }
-    enum Prioridad {
+    public enum Prioridad {
         BAJA,
         MEDIA,
         ALTA
     }
 
-    Tarea(int id, String titulo, String descripcion, Prioridad prioridad) {
+    public Tarea(String id, String titulo, String descripcion, Prioridad prioridad) {
         this.idTarea = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.prioridad = prioridad;
     }
 
-    public int getId() {
+    public String getId() {
         return idTarea;
     }
 

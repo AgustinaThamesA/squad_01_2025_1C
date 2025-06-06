@@ -1,4 +1,4 @@
-package src.main.java.psa.proyectos;
+package src.main.java.psa.modelo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,19 +17,19 @@ public class Proyecto {
     private List<Tarea> tareas;
     private String liderProyecto;
 
-    enum Estado {
+    public enum Estado {
         PLANIFICADO,
         EN_CURSO,
         FINALIZADO
     }
 
-    enum Etapa {
+    public enum Etapa {
         INICIO,
         DESARROLLO,
         TRANSICION
     }
 
-    Proyecto(String nombre, String descripcion, String liderProyecto) {
+    public Proyecto(String nombre, String descripcion, String liderProyecto) {
         // en el futuro debería ser obtener el id del último proyecto creado y sumarle 1
         this.id = contadorProyecto;
         this.nombre = nombre;
