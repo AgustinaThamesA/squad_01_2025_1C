@@ -1,17 +1,22 @@
 plugins {
+    // Define el plugin de Java para compilar proyectos en Java
     id("java")
+    // Plugin para verificar estándares de código Java
     id("checkstyle")
 }
 
 repositories {
+    // Usa Maven Central para las dependencias
     mavenCentral()
 }
 
 allprojects {
     repositories {
+        // Todas las dependencias se resuelven usando Maven Central
         mavenCentral()
     }
 }
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "checkstyle")
@@ -24,7 +29,7 @@ subprojects {
         testImplementation("io.cucumber:cucumber-java:7.14.0")
         testImplementation("io.cucumber:cucumber-junit:7.14.0")
         testImplementation("io.cucumber:cucumber-junit-platform-engine:7.14.0")
-
+        
         // Necesario para ejecutar Cucumber con JUnit 5
         testImplementation("org.junit.platform:junit-platform-suite-api:1.10.0")
         testImplementation("org.junit.platform:junit-platform-suite:1.10.0")
@@ -50,21 +55,21 @@ subprojects {
         group = "verification"
 
         include("**/*CucumberTest*")
-
+    
         testLogging {
             events("passed", "skipped", "failed")
             showStandardStreams = true
         }
-
+        
         reports {
             html.required.set(true)
         }
-
-        systemProperty("cucumber.glue", "org.pmtool.steps")
+        
+        systemProperty("cucumber.glue", "org.psa.steps")
         systemProperty("cucumber.plugin", "pretty,json:build/reports/cucumber/cucumber.json")
         systemProperty("cucumber.features", "src/test/resources/features/")
         systemProperty("cucumber.publish.quiet", "true")
-
+        
         // Asegurarse de que los tests de Cucumber se ejecuten
         testClassesDirs = files(project.sourceSets.getByName("test").output.classesDirs)
         classpath = project.sourceSets.getByName("test").runtimeClasspath
