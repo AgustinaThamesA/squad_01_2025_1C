@@ -25,10 +25,18 @@ public class ReporteEstado {
     }
 
     // Getters
-    public int getIdReporte() { return idReporte; }
-    public LocalDate getFecha() { return fecha; }
-    public double getPorcentajeAvance() { return porcentajeAvance; }
-    public String getComentarios() { return comentarios; }
+    public int getIdReporte() {
+        return idReporte;
+    }
+    public LocalDate getFecha() {
+        return fecha;
+    }
+    public double getPorcentajeAvance() {
+        return porcentajeAvance;
+    }
+    public String getComentarios() {
+        return comentarios;
+    }
 
     // Setters
     public void setPorcentajeAvance(double porcentajeAvance) {

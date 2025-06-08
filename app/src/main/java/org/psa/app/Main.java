@@ -2,10 +2,14 @@ package org.psa.app;
 
 import org.psa.manager.GerentePortafolio;
 import org.psa.manager.GerenteProyecto;
-import org.psa.model.*;
+import org.psa.model.Fase;
+import org.psa.model.Proyecto;
+import org.psa.model.ReporteEstado;
+import org.psa.model.Riesgo;
+import org.psa.model.Tarea;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {

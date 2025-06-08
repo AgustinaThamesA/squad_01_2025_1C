@@ -28,7 +28,9 @@ public class Tarea {
             this.displayName = displayName;
         }
         
-        public String getDisplayName() { return displayName; }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public enum Prioridad {
@@ -42,7 +44,9 @@ public class Tarea {
             this.displayName = displayName;
         }
         
-        public String getDisplayName() { return displayName; }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public Tarea(String titulo, String descripcion, Prioridad prioridad, String responsable) {
@@ -56,21 +60,47 @@ public class Tarea {
     }
 
     // Getters
-    public int getIdTarea() { return idTarea; }
-    public String getTitulo() { return titulo; }
-    public String getDescripcion() { return descripcion; }
-    public Estado getEstado() { return estado; }
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    public LocalDate getFechaFinEstimada() { return fechaFinEstimada; }
-    public LocalDate getFechaFinReal() { return fechaFinReal; }
-    public Prioridad getPrioridad() { return prioridad; }
-    public String getResponsable() { return responsable; }
-    public List<Fase> getFases() { return fases; }
+    public int getIdTarea() {
+        return idTarea;
+    }
+    public String getTitulo() {
+        return titulo;
+    }
+    public String getDescripcion() {
+        return descripcion;
+    }
+    public Estado getEstado() {
+        return estado;
+    }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+    public LocalDate getFechaFinEstimada() {
+        return fechaFinEstimada;
+    }
+    public LocalDate getFechaFinReal() {
+        return fechaFinReal;
+    }
+    public Prioridad getPrioridad() {
+        return prioridad;
+    }
+    public String getResponsable() {
+        return responsable;
+    }
+    public List<Fase> getFases() {
+        return fases;
+    }
 
     // Setters y métodos de negocio
-    public void setEstado(Estado estado) { this.estado = estado; }
-    public void setPrioridad(Prioridad prioridad) { this.prioridad = prioridad; }
-    public void setResponsable(String responsable) { this.responsable = responsable; }
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+    public void setPrioridad(Prioridad prioridad) {
+        this.prioridad = prioridad;
+    }
+    public void setResponsable(String responsable) {
+        this.responsable = responsable;
+    }
 
     public void planificarFechas(LocalDate inicio, LocalDate fin) {
         this.fechaInicio = inicio;
@@ -103,8 +133,8 @@ public class Tarea {
     }
 
     public boolean estaVencida() {
-        return fechaFinEstimada != null && 
-               LocalDate.now().isAfter(fechaFinEstimada) && 
+        return fechaFinEstimada != null &&
+               LocalDate.now().isAfter(fechaFinEstimada) &&
                estado != Estado.COMPLETADA;
     }
 

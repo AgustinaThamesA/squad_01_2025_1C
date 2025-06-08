@@ -21,16 +21,32 @@ public class Fase {
     }
 
     // Getters
-    public int getIdFase() { return idFase; }
-    public String getNombre() { return nombre; }
-    public int getOrden() { return orden; }
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    public LocalDate getFechaFinEstimada() { return fechaFinEstimada; }
-    public List<Tarea> getTareas() { return tareas; }
+    public int getIdFase() {
+        return idFase;
+    }
+    public String getNombre() {
+        return nombre;
+    }
+    public int getOrden() {
+        return orden;
+    }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+    public LocalDate getFechaFinEstimada() {
+        return fechaFinEstimada;
+    }
+    public List<Tarea> getTareas() {
+        return tareas;
+    }
 
     // Setters y métodos de negocio
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public void setOrden(int orden) { this.orden = orden; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    public void setOrden(int orden) {
+        this.orden = orden;
+    }
 
     public void planificarFechas(LocalDate inicio, LocalDate fin) {
         this.fechaInicio = inicio;
@@ -50,8 +66,9 @@ public class Fase {
     }
 
     public double calcularPorcentajeAvance() {
-        if (tareas.isEmpty()) return 0.0;
-        
+        if (tareas.isEmpty()) {
+            return 0.0;
+        }
         long tareasCompletadas = tareas.stream()
             .filter(tarea -> tarea.getEstado() == Tarea.Estado.COMPLETADA)
             .count();
@@ -61,8 +78,12 @@ public class Fase {
 
     public String getEstadoDescriptivo() {
         double progreso = calcularPorcentajeAvance();
-        if (progreso == 100.0) return "Completada";
-        else if (progreso > 0) return "En Progreso";
-        else return "Pendiente";
+        if (progreso == 100.0) {
+            return "Completada";
+        } else if (progreso > 0) {
+            return "En Progreso";
+        } else {
+            return "Pendiente";
+        }
     }
 }

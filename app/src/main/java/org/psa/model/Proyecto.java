@@ -20,12 +20,16 @@ public class Proyecto {
 
     public enum Estado {
         ACTIVO("Activo"),
-        PAUSADO("Pausado"), 
+        PAUSADO("Pausado"),
         CERRADO("Cerrado");
-        
+
         private final String displayName;
-        Estado(String displayName) { this.displayName = displayName; }
-        public String getDisplayName() { return displayName; }
+        Estado(String displayName) {
+            this.displayName = displayName;
+        }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public Proyecto(String nombre, String descripcion, String liderProyecto) {
@@ -40,21 +44,47 @@ public class Proyecto {
     }
 
     // Getters
-    public int getIdProyecto() { return idProyecto; }
-    public String getNombre() { return nombre; }
-    public String getDescripcion() { return descripcion; }
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    public LocalDate getFechaFinEstimada() { return fechaFinEstimada; }
-    public LocalDate getFechaFinReal() { return fechaFinReal; }
-    public Estado getEstado() { return estado; }
-    public String getLiderProyecto() { return liderProyecto; }
-    public List<Fase> getFases() { return fases; }
-    public List<Riesgo> getRiesgos() { return riesgos; }
-    public List<ReporteEstado> getReportes() { return reportes; }
+    public int getIdProyecto() {
+        return idProyecto;
+    }
+    public String getNombre() {
+        return nombre;
+    }
+    public String getDescripcion() {
+        return descripcion;
+    }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+    public LocalDate getFechaFinEstimada() {
+        return fechaFinEstimada;
+    }
+    public LocalDate getFechaFinReal() {
+        return fechaFinReal;
+    }
+    public Estado getEstado() {
+        return estado;
+    }
+    public String getLiderProyecto() {
+        return liderProyecto;
+    }
+    public List<Fase> getFases() {
+        return fases;
+    }
+    public List<Riesgo> getRiesgos() {
+        return riesgos;
+    }
+    public List<ReporteEstado> getReportes() {
+        return reportes;
+    }
 
     // Setters y métodos de negocio
-    public void setEstado(Estado estado) { this.estado = estado; }
-    public void setLiderProyecto(String liderProyecto) { this.liderProyecto = liderProyecto; }
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+    public void setLiderProyecto(String liderProyecto) {
+        this.liderProyecto = liderProyecto;
+    }
 
     public void planificarFechas(LocalDate inicio, LocalDate fin) {
         this.fechaInicio = inicio;
@@ -86,7 +116,9 @@ public class Proyecto {
     }
 
     public double calcularPorcentajeAvance() {
-        if (fases.isEmpty()) return 0.0;
+        if (fases.isEmpty()) {
+            return 0.0;
+        }
         
         double totalAvance = 0.0;
         for (Fase fase : fases) {

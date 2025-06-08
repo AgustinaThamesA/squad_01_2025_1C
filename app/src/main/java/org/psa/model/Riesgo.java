@@ -19,7 +19,9 @@ public class Riesgo {
             this.displayName = displayName;
         }
         
-        public String getDisplayName() { return displayName; }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public enum Impacto {
@@ -33,7 +35,9 @@ public class Riesgo {
             this.displayName = displayName;
         }
         
-        public String getDisplayName() { return displayName; }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public enum Estado {
@@ -43,8 +47,12 @@ public class Riesgo {
         CERRADO("Cerrado");
         
         private final String displayName;
-        Estado(String displayName) { this.displayName = displayName; }
-        public String getDisplayName() { return displayName; }
+        Estado(String displayName) {
+            this.displayName = displayName;
+        }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     public Riesgo(String descripcion, Probabilidad probabilidad, Impacto impacto) {
@@ -56,17 +64,35 @@ public class Riesgo {
     }
 
     // Getters
-    public int getIdRiesgo() { return idRiesgo; }
-    public String getDescripcion() { return descripcion; }
-    public Probabilidad getProbabilidad() { return probabilidad; }
-    public Impacto getImpacto() { return impacto; }
-    public Estado getEstado() { return estado; }
+    public int getIdRiesgo() {
+        return idRiesgo;
+    }
+    public String getDescripcion() {
+        return descripcion;
+    }
+    public Probabilidad getProbabilidad() {
+        return probabilidad;
+    }
+    public Impacto getImpacto() {
+        return impacto;
+    }
+    public Estado getEstado() {
+        return estado;
+    }
 
     // Setters y métodos de negocio
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-    public void setProbabilidad(Probabilidad probabilidad) { this.probabilidad = probabilidad; }
-    public void setImpacto(Impacto impacto) { this.impacto = impacto; }
-    public void setEstado(Estado estado) { this.estado = estado; }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    public void setProbabilidad(Probabilidad probabilidad) {
+        this.probabilidad = probabilidad;
+    }
+    public void setImpacto(Impacto impacto) {
+        this.impacto = impacto;
+    }
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
 
     public int calcularNivelRiesgo() {
         int nivelProbabilidad = probabilidad.ordinal() + 1; // 1-3

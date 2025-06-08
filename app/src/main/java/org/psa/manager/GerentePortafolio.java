@@ -40,7 +40,9 @@ public class GerentePortafolio {
     }
 
     public double calcularPorcentajeAvancePortafolio() {
-        if (proyectos.isEmpty()) return 0.0;
+        if (proyectos.isEmpty()) {
+            return 0.0;
+        }
         
         double sumaAvances = proyectos.stream()
             .mapToDouble(Proyecto::calcularPorcentajeAvance)
@@ -50,7 +52,9 @@ public class GerentePortafolio {
     }
 
     // Estadísticas para el dashboard
-    public int getTotalProyectos() { return proyectos.size(); }
+    public int getTotalProyectos() {
+        return proyectos.size();
+    }
     
     public int getProyectosActivos() {
         return (int) proyectos.stream()

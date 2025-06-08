@@ -1,10 +1,10 @@
 Feature: Gestión integral de riesgos del proyecto
-# Como project manager
+# Como gerente de proyecto
 # Quiero poder registrar, clasificar y gestionar los riesgos de un proyecto
 # Para anticiparme a posibles problemas y mitigar su impacto en tiempos, costos o funcionalidades
 
   Scenario: Registrar un nuevo riesgo
-    Given que soy project manager de un proyecto activo
+    Given que soy gerente de proyecto de un proyecto activo
     When registro un riesgo con su descripción, impacto y probabilidad
     Then el sistema lo almacena y lo clasifica automáticamente según severidad
 
@@ -20,6 +20,6 @@ Feature: Gestión integral de riesgos del proyecto
     Then los veo ordenados por severidad de mayor a menor
 
   Scenario: Control de permisos para gestionar riesgos
-    Given que soy un usuario sin rol de project manager
+    Given que soy un usuario sin rol de gerente de proyecto
     When intento registrar o editar un riesgo
     Then el sistema me impide realizar la acción y muestra un mensaje de error

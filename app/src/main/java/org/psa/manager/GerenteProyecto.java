@@ -1,6 +1,10 @@
 package org.psa.manager;
 
-import org.psa.model.*;
+import org.psa.model.Fase;
+import org.psa.model.Proyecto;
+import org.psa.model.ReporteEstado;
+import org.psa.model.Riesgo;
+import org.psa.model.Tarea;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;

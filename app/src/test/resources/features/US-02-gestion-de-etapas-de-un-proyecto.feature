@@ -5,7 +5,7 @@ Feature: Gestión de etapas de un proyecto
 
   Scenario: Cambiar la etapa de un proyecto
     Given que el proyecto está en etapa "Inicio"
-    When marco la etapa como "Desarrollo"
+    When marco la etapa como "Análisis"
     Then la etapa del proyecto debe actualizarse correctamente
 
   Scenario: No permitir saltar etapas
