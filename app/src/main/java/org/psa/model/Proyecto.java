@@ -14,9 +14,9 @@ public class Proyecto {
     private LocalDate fechaFinReal;
     private Estado estado;
     private String liderProyecto;
-    private List<Fase> fases;
-    private List<Riesgo> riesgos;
-    private List<ReporteEstado> reportes;
+    private List<org.psa.model.Fase> fases;
+    private List<org.psa.model.Riesgo> riesgos;
+    private List<org.psa.model.ReporteEstado> reportes;
 
     public enum Estado {
         ACTIVO("Activo"),
@@ -68,13 +68,13 @@ public class Proyecto {
     public String getLiderProyecto() {
         return liderProyecto;
     }
-    public List<Fase> getFases() {
+    public List<org.psa.model.Fase> getFases() {
         return fases;
     }
-    public List<Riesgo> getRiesgos() {
+    public List<org.psa.model.Riesgo> getRiesgos() {
         return riesgos;
     }
-    public List<ReporteEstado> getReportes() {
+    public List<org.psa.model.ReporteEstado> getReportes() {
         return reportes;
     }
 
@@ -103,15 +103,15 @@ public class Proyecto {
         this.estado = Estado.PAUSADO;
     }
 
-    public void agregarFase(Fase fase) {
+    public void agregarFase(org.psa.model.Fase fase) {
         this.fases.add(fase);
     }
 
-    public void agregarRiesgo(Riesgo riesgo) {
+    public void agregarRiesgo(org.psa.model.Riesgo riesgo) {
         this.riesgos.add(riesgo);
     }
 
-    public void agregarReporte(ReporteEstado reporte) {
+    public void agregarReporte(org.psa.model.ReporteEstado reporte) {
         this.reportes.add(reporte);
     }
 
@@ -121,7 +121,7 @@ public class Proyecto {
         }
         
         double totalAvance = 0.0;
-        for (Fase fase : fases) {
+        for (org.psa.model.Fase fase : fases) {
             totalAvance += fase.calcularPorcentajeAvance();
         }
         
@@ -134,7 +134,7 @@ public class Proyecto {
 
     public int getRiesgosActivos() {
         return (int) riesgos.stream()
-            .filter(riesgo -> riesgo.getEstado() == Riesgo.Estado.ACTIVO)
+            .filter(riesgo -> riesgo.getEstado() == org.psa.model.Riesgo.Estado.ACTIVO)
             .count();
     }
 }
