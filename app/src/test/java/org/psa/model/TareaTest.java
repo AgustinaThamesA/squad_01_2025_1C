@@ -27,17 +27,17 @@ public class TareaTest {
         Assertions.assertEquals("Tarea de ejemplo", tarea.getDescripcion());
         Assertions.assertEquals(Tarea.Prioridad.BAJA, tarea.getPrioridad());
         Assertions.assertEquals("Desarrollador X", tarea.getResponsable());
-        /* como los tests se corren en orden, para este punto ya se crearon 10 tareas en GerentePortagolioTest,
-        FaseTest y ProyectoTest, por lo que el contador de tareas no arranca en 1
+        /* como los tests se corren en orden, para este punto ya se crearon 12 tareas en GerentePortafolioTest,
+        GerenteProyectoTest, FaseTest y ProyectoTest, por lo que el contador de tareas no arranca en 1
         */
-        Assertions.assertEquals(11, tarea.getIdTarea());
+        Assertions.assertEquals(13, tarea.getIdTarea());
     }
 
     @Test
     public void nuevaTareaAumentaIdTest() {
         Tarea tarea2 = new Tarea("Tarea test 2", "Otra tarea", Tarea.Prioridad.ALTA,
                 "Otra persona");
-        Assertions.assertEquals(12, tarea2.getIdTarea());
+        Assertions.assertEquals(14, tarea2.getIdTarea());
     }
 
     @Test
