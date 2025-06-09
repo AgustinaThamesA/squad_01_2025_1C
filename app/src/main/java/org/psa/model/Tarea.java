@@ -15,7 +15,7 @@ public class Tarea {
     private LocalDate fechaFinReal;
     private Prioridad prioridad;
     private String responsable;
-    private List<Fase> fases; // Relación n:m con fases
+    private List<org.psa.model.Fase> fases; // Relación n:m con fases
 
     public enum Estado {
         PENDIENTE("Pendiente"),
@@ -87,7 +87,7 @@ public class Tarea {
     public String getResponsable() {
         return responsable;
     }
-    public List<Fase> getFases() {
+    public List<org.psa.model.Fase> getFases() {
         return fases;
     }
 
@@ -118,13 +118,13 @@ public class Tarea {
     }
 
     // Métodos para relación n:m con fases
-    public void agregarFase(Fase fase) {
+    public void agregarFase(org.psa.model.Fase fase) {
         if (!this.fases.contains(fase)) {
             this.fases.add(fase);
         }
     }
 
-    public void removerFase(Fase fase) {
+    public void removerFase(org.psa.model.Fase fase) {
         this.fases.remove(fase);
     }
 

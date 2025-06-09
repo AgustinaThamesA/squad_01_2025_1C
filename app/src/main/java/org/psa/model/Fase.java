@@ -11,13 +11,13 @@ public class Fase {
     private int orden;
     private LocalDate fechaInicio;
     private LocalDate fechaFinEstimada;
-    private List<Tarea> tareas; // Relación n:m con tareas
+    private List<org.psa.model.Tarea> tareas; // Relación n:m con tareas
 
     public Fase(String nombre, int orden) {
         this.idFase = contadorFase++;
         this.nombre = nombre;
         this.orden = orden;
-        this.tareas = new ArrayList<>();
+        this.tareas = new ArrayList<org.psa.model.Tarea>();
     }
 
     // Getters
@@ -36,7 +36,7 @@ public class Fase {
     public LocalDate getFechaFinEstimada() {
         return fechaFinEstimada;
     }
-    public List<Tarea> getTareas() {
+    public List<org.psa.model.Tarea> getTareas() {
         return tareas;
     }
 
@@ -53,14 +53,14 @@ public class Fase {
         this.fechaFinEstimada = fin;
     }
 
-    public void agregarTarea(Tarea tarea) {
+    public void agregarTarea(org.psa.model.Tarea tarea) {
         if (!this.tareas.contains(tarea)) {
             this.tareas.add(tarea);
             tarea.agregarFase(this); // Mantener consistencia bidireccional
         }
     }
 
-    public void removerTarea(Tarea tarea) {
+    public void removerTarea(org.psa.model.Tarea tarea) {
         this.tareas.remove(tarea);
         tarea.removerFase(this);
     }
@@ -70,7 +70,7 @@ public class Fase {
             return 0.0;
         }
         long tareasCompletadas = tareas.stream()
-            .filter(tarea -> tarea.getEstado() == Tarea.Estado.COMPLETADA)
+            .filter(tarea -> tarea.getEstado() == org.psa.model.Tarea.Estado.COMPLETADA)
             .count();
         
         return (double) tareasCompletadas / tareas.size() * 100;
