@@ -1,22 +1,28 @@
 package src.test.java.org.psa.model;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.psa.model.Proyecto;
+import org.psa.model.Fase;
+import org.psa.model.Riesgo;
+import org.psa.model.ReporteEstado;
+import org.psa.model.Tarea;
 
 import java.time.LocalDate;
 
 
 public class ProyectoTest {
-    private Proyecto proyecto;
+    private static Proyecto proyecto;
+    private static Fase fase;
 
-    @BeforeEach
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         String nombre = "Proyecto test";
         String descripcion = "Este es un proyecto de prueba";
         String lider = "Persona random";
         proyecto = new Proyecto(nombre, descripcion, lider);
+        fase = new Fase("Fase test", 1);
     }
 
     @Test
@@ -48,6 +54,51 @@ public class ProyectoTest {
         Assertions.assertEquals(Proyecto.Estado.PAUSADO, proyecto.getEstado());
     }
 
+    @Test
+    public void setLiderProyectoTest() {
+        String nuevoLider = "Nuevo Lider";
+        proyecto.setLiderProyecto(nuevoLider);
+        Assertions.assertEquals(nuevoLider, proyecto.getLiderProyecto());
+    }
 
+    @Test
+    public void calcularPorcentajeAvanceProyectoSinFases() {
+        double esperado = 0.0;
+        Assertions.assertEquals(esperado, proyecto.calcularPorcentajeAvance());
+    }
+
+    @Test
+    public void agregarFaseTest() {
+        proyecto.agregarFase(fase);
+        Assertions.assertEquals(1, proyecto.getFases().size());
+        assert proyecto.getFases().contains(fase);
+    }
+
+    @Test
+    public void agregarRiesgoTest() {
+        Riesgo riesgo = new Riesgo("Riesgo prueba", Riesgo.Probabilidad.ALTA, Riesgo.Impacto.BAJO);
+        proyecto.agregarRiesgo(riesgo);
+        Assertions.assertEquals(1, proyecto.getRiesgos().size());
+        assert proyecto.getRiesgos().contains(riesgo);
+    }
+
+    @Test
+    public void agregarReporteTest() {
+        ReporteEstado reporteEstado = new ReporteEstado(40, "Reporte ejemplo");
+        proyecto.agregarReporte(reporteEstado);
+        Assertions.assertEquals(1, proyecto.getReportes().size());
+        assert proyecto.getReportes().contains(reporteEstado);
+    }
+
+    @Test
+    public void calcularPorcentajeAvanceFaseConTarea() {
+        Tarea tarea = new Tarea("Tarea prueba", "Tarea de ejemplo", Tarea.Prioridad.BAJA,
+                "Desarrollador 1");
+        fase.agregarTarea(tarea);
+        tarea.completarTarea();
+        double esperado = 100;
+        Assertions.assertEquals(esperado, proyecto.calcularPorcentajeAvance());
+
+    }
 
 }
