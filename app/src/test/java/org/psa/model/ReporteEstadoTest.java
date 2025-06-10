@@ -21,10 +21,10 @@ public class ReporteEstadoTest {
     @Test
     public void crearReporteConFecha() {
         Assertions.assertEquals(LocalDate.of(2025, 1, 1), reporteEstado.getFecha());
-        /* Al igual que paso con tarea, ProyectoTest utiliza ReporteEstado y se ejecuta antes que este test, por lo que
-        corresponde arrancar a contar desde el 2
+        /* Al igual que paso con tarea, GerenteProyectoTest y ProyectoTest utilizan ReporteEstado y se ejecuta antes que
+        este test, por lo que corresponde arrancar a contar desde el 3
         * */
-        Assertions.assertEquals(2, reporteEstado.getIdReporte());
+        Assertions.assertEquals(4, reporteEstado.getIdReporte());
         Assertions.assertEquals(50, reporteEstado.getPorcentajeAvance());
         Assertions.assertEquals("Este es un reporte de estado", reporteEstado.getComentarios());
     }
@@ -32,7 +32,7 @@ public class ReporteEstadoTest {
     @Test
     public void crearReporteSinFecha() {
         Assertions.assertEquals(LocalDate.now(), reporteEstado2.getFecha());
-        Assertions.assertEquals(3, reporteEstado2.getIdReporte());
+        Assertions.assertEquals(5, reporteEstado2.getIdReporte());
     }
 
     @Test
