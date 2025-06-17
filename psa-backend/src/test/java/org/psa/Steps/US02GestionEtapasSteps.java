@@ -22,13 +22,13 @@ public class US02GestionEtapasSteps {
         this.proyecto = new Proyecto("Proyecto Test", "Descripción de prueba", "Juan Pérez");
 
         // Defino TODAS las etapas en orden para que estén todas en la lista y no falle
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Inicio", 0);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Análisis", 1);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Diseño", 2);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Desarrollo", 3);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Testing", 4);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Despliegue", 5);
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Transición", 6);
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Inicio");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Análisis");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Diseño");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Desarrollo");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Testing");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Despliegue");
+        proyectoService.crearFase(proyecto.getIdProyecto(), "Transición");
     }
 
     @Given("que el proyecto está en etapa {string}")

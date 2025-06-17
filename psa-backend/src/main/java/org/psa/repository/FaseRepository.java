@@ -15,6 +15,9 @@ public interface FaseRepository extends JpaRepository<Fase, Long> {
     // Obtener fases de un proyecto ordenadas por orden
     List<Fase> findByProyectoIdProyectoOrderByOrden(Long proyectoId);
     
+    // AGREGADO: Contar fases de un proyecto (necesario para calcular el próximo orden)
+    int countByProyectoIdProyecto(Long proyectoId);
+    
     // Obtener fases por nombre
     List<Fase> findByNombreContainingIgnoreCase(String nombre);
     

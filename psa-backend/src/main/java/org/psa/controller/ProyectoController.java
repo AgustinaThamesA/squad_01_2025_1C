@@ -70,10 +70,36 @@ public class ProyectoController {
         return proyectoService.obtenerFasesDelProyecto(id);
     }
 
+   // Reemplaza el método crearFase en tu ProyectoController.java
     @PostMapping("/{id}/fases")
     public ResponseEntity<Fase> crearFase(@PathVariable Long id, @RequestBody CrearFaseRequest request) {
-        Fase fase = proyectoService.crearFase(id, request.getNombre(), request.getOrden());
+        // Solo pasamos el nombre, el service calculará el orden automáticamente
+        Fase fase = proyectoService.crearFase(id, request.getNombre());
         return fase != null ? ResponseEntity.ok(fase) : ResponseEntity.notFound().build();
+    }
+
+    // Y asegúrate de que la clase CrearFaseRequest esté definida al final del archivo
+    // junto con las otras clases auxiliares. Si no existe, agrégala:
+
+    public static class CrearFaseRequest {
+        private String nombre;
+        private Integer orden; // Este campo ahora es opcional
+        
+        public String getNombre() { 
+            return nombre; 
+        }
+        
+        public void setNombre(String nombre) { 
+            this.nombre = nombre; 
+        }
+        
+        public Integer getOrden() { 
+            return orden; 
+        }
+        
+        public void setOrden(Integer orden) { 
+            this.orden = orden; 
+        }
     }
 
     @PutMapping("/fases/{faseId}/planificar")
