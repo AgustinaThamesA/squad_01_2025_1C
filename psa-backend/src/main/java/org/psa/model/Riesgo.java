@@ -1,5 +1,6 @@
 package org.psa.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -8,7 +9,7 @@ public class Riesgo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idRiesgo; // Cambio: int → Long
+    private Long idRiesgo;
     
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descripcion;
@@ -22,11 +23,12 @@ public class Riesgo {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
-    // Relación con Proyecto (lado "muchos" de la relación 1:n)
+    // ✅ SOLUCIÓN: Agregar @JsonBackReference para evitar bucle
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proyecto_id")
+    @JsonBackReference("proyecto-riesgos") // ✅ Este lado NO se serializa
     private Proyecto proyecto;
-
+    
     // Tus enums originales (SIN CAMBIOS - perfectos)
     public enum Probabilidad {
         BAJA("Baja"),
@@ -43,7 +45,7 @@ public class Riesgo {
             return displayName;
         }
     }
-
+    
     public enum Impacto {
         BAJO("Bajo"),
         MEDIO("Medio"),
@@ -59,7 +61,7 @@ public class Riesgo {
             return displayName;
         }
     }
-
+    
     public enum Estado {
         ACTIVO("Activo"),
         MITIGADO("Mitigado"),
@@ -67,70 +69,81 @@ public class Riesgo {
         CERRADO("Cerrado");
         
         private final String displayName;
+        
         Estado(String displayName) {
             this.displayName = displayName;
         }
+        
         public String getDisplayName() {
             return displayName;
         }
     }
-
+    
     // Constructor por defecto (requerido por JPA)
     public Riesgo() {
     }
-
-    // Tu constructor original (lógica mantenida, sin contador estático)
+    
+    // Tu constructor original
     public Riesgo(String descripcion, Probabilidad probabilidad, Impacto impacto) {
         this.descripcion = descripcion;
         this.probabilidad = probabilidad;
         this.impacto = impacto;
         this.estado = Estado.ACTIVO;
     }
-
-    // Getters (adaptados para Long)
-    public Long getIdRiesgo() { // Cambio: int → Long
+    
+    // Getters
+    public Long getIdRiesgo() {
         return idRiesgo;
     }
+    
     public String getDescripcion() {
         return descripcion;
     }
+    
     public Probabilidad getProbabilidad() {
         return probabilidad;
     }
+    
     public Impacto getImpacto() {
         return impacto;
     }
+    
     public Estado getEstado() {
         return estado;
     }
-    public Proyecto getProyecto() { // Getter para la relación JPA
+    
+    public Proyecto getProyecto() {
         return proyecto;
     }
-
-    // Setters y métodos de negocio (SIN CAMBIOS - tu lógica se mantiene)
+    
+    // Setters y métodos de negocio (SIN CAMBIOS)
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+    
     public void setProbabilidad(Probabilidad probabilidad) {
         this.probabilidad = probabilidad;
     }
+    
     public void setImpacto(Impacto impacto) {
         this.impacto = impacto;
     }
+    
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
-    public void setProyecto(Proyecto proyecto) { // Setter para la relación JPA
+    
+    public void setProyecto(Proyecto proyecto) {
         this.proyecto = proyecto;
     }
-
+    
     // Tus métodos de cálculo (SIN CAMBIOS - perfectos)
     public int calcularNivelRiesgo() {
         int nivelProbabilidad = probabilidad.ordinal() + 1; // 1-3
         int nivelImpacto = impacto.ordinal() + 1; // 1-3
         return nivelProbabilidad * nivelImpacto; // 1-9
     }
-
+    
     public boolean esRiesgoAlto() {
         return calcularNivelRiesgo() >= 6;
     }

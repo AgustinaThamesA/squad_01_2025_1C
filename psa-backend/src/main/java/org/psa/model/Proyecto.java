@@ -1,5 +1,6 @@
 package org.psa.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class Proyecto {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProyecto; // Cambio: int → Long (estándar JPA)
+    private Long idProyecto;
     
     @Column(nullable = false)
     private String nombre;
@@ -28,17 +29,20 @@ public class Proyecto {
     
     private String liderProyecto;
     
-    // Relaciones JPA (mantiene tu lógica bidireccional)
+    // ✅ SOLUCIÓN: Agregar @JsonManagedReference para controlar la serialización
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("proyecto-fases") // ✅ Este lado SÍ se serializa
     private List<Fase> fases;
     
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("proyecto-riesgos") // ✅ Este lado SÍ se serializa
     private List<Riesgo> riesgos;
     
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("proyecto-reportes") // ✅ Este lado SÍ se serializa
     private List<ReporteEstado> reportes;
 
-    // Enum Estado (sin cambios - perfecto como está)
+    // Enum Estado (sin cambios)
     public enum Estado {
         ACTIVO("Activo"),
         PAUSADO("Pausado"),
@@ -60,21 +64,20 @@ public class Proyecto {
         this.reportes = new ArrayList<>();
     }
 
-    // Tu constructor original (sin cambios en lógica)
+    // Tu constructor original
     public Proyecto(String nombre, String descripcion, String liderProyecto) {
-        this(); // Llama al constructor por defecto
+        this();
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.estado = Estado.ACTIVO;
         this.liderProyecto = liderProyecto;
     }
 
-    // Getters (adaptados para Long)
-    public Long getIdProyecto() { // Cambio: int → Long
+    // Getters
+    public Long getIdProyecto() {
         return idProyecto;
     }
     
-    // Setter para ID (necesario para JPA)
     public void setIdProyecto(Long idProyecto) {
         this.idProyecto = idProyecto;
     }
@@ -109,7 +112,7 @@ public class Proyecto {
         return reportes;
     }
 
-    // Setters y métodos de negocio (SIN CAMBIOS - tu lógica se mantiene)
+    // Setters y métodos de negocio (SIN CAMBIOS)
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
@@ -136,20 +139,20 @@ public class Proyecto {
 
     public void agregarFase(Fase fase) {
         this.fases.add(fase);
-        fase.setProyecto(this); // Mantener consistencia bidireccional
+        fase.setProyecto(this);
     }
 
     public void agregarRiesgo(Riesgo riesgo) {
         this.riesgos.add(riesgo);
-        riesgo.setProyecto(this); // Mantener consistencia bidireccional
+        riesgo.setProyecto(this);
     }
 
     public void agregarReporte(ReporteEstado reporte) {
         this.reportes.add(reporte);
-        reporte.setProyecto(this); // Mantener consistencia bidireccional
+        reporte.setProyecto(this);
     }
 
-    // Tus métodos de cálculo (SIN CAMBIOS - perfectos)
+    // Métodos de cálculo (SIN CAMBIOS)
     public double calcularPorcentajeAvance() {
         if (fases.isEmpty()) {
             return 0.0;

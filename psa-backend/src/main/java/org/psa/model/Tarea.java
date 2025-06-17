@@ -1,5 +1,6 @@
 package org.psa.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class Tarea {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idTarea; // Cambio: int → Long
+    private Long idTarea;
     
     @Column(nullable = false)
     private String titulo;
@@ -31,16 +32,17 @@ public class Tarea {
     
     private String responsable;
     
-    // Relación n:m con Fases (tu lógica original mantenida)
+    // ✅ SOLUCIÓN: Agregar @JsonManagedReference aquí
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "tarea_fase",
         joinColumns = @JoinColumn(name = "tarea_id"),
         inverseJoinColumns = @JoinColumn(name = "fase_id")
     )
+    @JsonManagedReference // ✅ Esta lado será serializado
     private List<Fase> fases;
 
-    // Tus enums originales (SIN CAMBIOS - perfectos)
+    // Tus enums originales (SIN CAMBIOS)
     public enum Estado {
         PENDIENTE("Pendiente"),
         EN_PROGRESO("En Progreso"),
@@ -78,7 +80,7 @@ public class Tarea {
         this.fases = new ArrayList<>();
     }
 
-    // Tu constructor original (lógica mantenida, sin contador estático)
+    // Tu constructor original
     public Tarea(String titulo, String descripcion, Prioridad prioridad, String responsable) {
         this();
         this.titulo = titulo;
@@ -88,8 +90,8 @@ public class Tarea {
         this.estado = Estado.PENDIENTE;
     }
 
-    // Getters (adaptados para Long)
-    public Long getIdTarea() { // Cambio: int → Long
+    // Getters (todos iguales)
+    public Long getIdTarea() {
         return idTarea;
     }
     public String getTitulo() {
@@ -120,7 +122,7 @@ public class Tarea {
         return fases;
     }
 
-    // Setters y métodos de negocio (SIN CAMBIOS - tu lógica se mantiene)
+    // Setters y métodos de negocio (SIN CAMBIOS)
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
@@ -146,7 +148,7 @@ public class Tarea {
         this.estado = Estado.COMPLETADA;
     }
 
-    // Métodos para relación n:m con fases (SIN CAMBIOS - perfectos)
+    // Métodos para relación n:m con fases (SIN CAMBIOS)
     public void agregarFase(Fase fase) {
         if (!this.fases.contains(fase)) {
             this.fases.add(fase);
