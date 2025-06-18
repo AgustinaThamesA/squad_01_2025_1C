@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProyectoService {
@@ -343,4 +344,67 @@ public class ProyectoService {
             return totalFases;
         }
     }
+
+    // 🔧 AGREGAR: Obtener todas las tareas de un proyecto
+public List<Tarea> obtenerTareasDelProyecto(Long proyectoId) {
+    if (proyectoId == null) {
+        throw new IllegalArgumentException("El ID del proyecto no puede ser nulo");
+    }
+    
+    // Verificar que el proyecto existe
+    Proyecto proyecto = obtenerProyectoPorId(proyectoId);
+    
+    // Obtener todas las tareas del proyecto a través de sus fases
+    return proyecto.getFases().stream()
+            .flatMap(fase -> fase.getTareas().stream())
+            .distinct() // Por si una tarea está en múltiples fases
+            .collect(Collectors.toList());
+}
+
+// 🔧 AGREGAR: Crear tarea asociada a proyecto y opcionalmente a fase
+@Transactional
+public Tarea crearTarea(Long proyectoId, Long faseId, String titulo, String descripcion, 
+                       Tarea.Prioridad prioridad, String responsable) {
+    if (titulo == null || titulo.isBlank()) {
+        throw new IllegalArgumentException("El título de la tarea no puede ser vacío");
+    }
+    if (responsable == null || responsable.isBlank()) {
+        throw new IllegalArgumentException("El responsable no puede ser vacío");
+    }
+    if (proyectoId == null) {
+        throw new IllegalArgumentException("El ID del proyecto no puede ser nulo");
+    }
+    
+    // Verificar que el proyecto existe
+    Proyecto proyecto = obtenerProyectoPorId(proyectoId);
+    
+    // Crear la tarea
+    Tarea tarea = new Tarea(titulo, descripcion, prioridad, responsable);
+    tarea = tareaRepository.save(tarea);
+    
+    // Si se especifica una fase, asignar la tarea a esa fase
+    if (faseId != null) {
+        Fase fase = faseRepository.findById(faseId)
+                .orElseThrow(() -> new IllegalArgumentException("Fase con ID " + faseId + " no encontrada"));
+        
+        // Verificar que la fase pertenece al proyecto
+        if (!fase.getProyecto().getIdProyecto().equals(proyectoId)) {
+            throw new IllegalArgumentException("La fase no pertenece al proyecto especificado");
+        }
+        
+        fase.agregarTarea(tarea);
+        faseRepository.save(fase);
+    } else {
+        // Si no se especifica fase, asignar a la primera fase del proyecto
+        List<Fase> fases = proyecto.getFases();
+        if (!fases.isEmpty()) {
+            Fase primeraFase = fases.get(0);
+            primeraFase.agregarTarea(tarea);
+            faseRepository.save(primeraFase);
+        }
+    }
+    
+    return tarea;
+}
+
 }

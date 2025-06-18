@@ -112,9 +112,18 @@ public class ProyectoController {
     // GESTIÓN DE TAREAS
     // ========================================
 
-    @PostMapping("/tareas")
-    public Tarea crearTarea(@RequestBody CrearTareaRequest request) {
+    // 🔧 AGREGAR: Obtener tareas de un proyecto específico
+    @GetMapping("/{id}/tareas")
+    public List<Tarea> obtenerTareasDelProyecto(@PathVariable Long id) {
+        return proyectoService.obtenerTareasDelProyecto(id);
+    }
+
+    // 🔧 CAMBIAR: El método crearTarea existente por este:
+    @PostMapping("/{proyectoId}/tareas")
+    public Tarea crearTarea(@PathVariable Long proyectoId, @RequestBody CrearTareaRequest request) {
         return proyectoService.crearTarea(
+            proyectoId,
+            request.getFaseId(), // Puede ser null
             request.getTitulo(), 
             request.getDescripcion(), 
             request.getPrioridad(), 
@@ -261,6 +270,7 @@ public class ProyectoController {
 
         return proyectoService.guardarProyecto(proyecto);
     }
+
 }
 
 // ========================================
@@ -316,6 +326,7 @@ class CrearTareaRequest {
     private String descripcion;
     private Tarea.Prioridad prioridad;
     private String responsable;
+    private Long faseId; // 🔧 AGREGAR esta línea
     
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
@@ -328,6 +339,10 @@ class CrearTareaRequest {
     
     public String getResponsable() { return responsable; }
     public void setResponsable(String responsable) { this.responsable = responsable; }
+    
+    // 🔧 AGREGAR estos dos métodos:
+    public Long getFaseId() { return faseId; }
+    public void setFaseId(Long faseId) { this.faseId = faseId; }
 }
 
 class AsignarFaseRequest {
