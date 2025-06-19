@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 import org.psa.service.RecursoService;
+import org.psa.repository.FaseRepository;
+import org.psa.repository.TareaRepository;
+import java.util.ArrayList;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +23,10 @@ public class ProyectoController {
     private ProyectoService proyectoService;
     @Autowired  
     private RecursoService recursoService;
+    @Autowired
+    private FaseRepository faseRepository;
+    @Autowired
+    private TareaRepository tareaRepository;
 
     // ========================================
     // GESTIÓN BÁSICA DE PROYECTOS
@@ -467,6 +474,217 @@ public class ProyectoController {
             .collect(Collectors.toList());
     }
 
+    // ========================================
+    // ENDPOINTS DE EDICIÓN - AGREGAR AL ProyectoController.java
+    // ========================================
+
+    // ✅ EDITAR PROYECTO COMPLETO
+    @PutMapping("/{id}")
+    public ResponseEntity<Proyecto> editarProyecto(@PathVariable Long id, @RequestBody EditarProyectoRequest request) {
+        try {
+            Proyecto proyecto = proyectoService.obtenerProyectoPorId(id);
+            
+            // Actualizar campos
+            if (request.getNombre() != null && !request.getNombre().isBlank()) {
+                proyecto.setNombre(request.getNombre());
+            }
+            if (request.getDescripcion() != null) {
+                proyecto.setDescripcion(request.getDescripcion());
+            }
+            if (request.getLiderProyecto() != null) {
+                proyecto.setLiderProyecto(request.getLiderProyecto());
+            }
+            
+            Proyecto proyectoActualizado = proyectoService.actualizarProyecto(proyecto);
+            return ResponseEntity.ok(proyectoActualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ EDITAR FASE
+    @PutMapping("/fases/{faseId}")
+    public ResponseEntity<Fase> editarFase(@PathVariable Long faseId, @RequestBody EditarFaseRequest request) {
+        try {
+            Fase fase = faseRepository.findById(faseId)
+                .orElseThrow(() -> new IllegalArgumentException("Fase no encontrada"));
+            
+            // Actualizar campos
+            if (request.getNombre() != null && !request.getNombre().isBlank()) {
+                fase.setNombre(request.getNombre());
+            }
+            if (request.getOrden() != null) {
+                fase.setOrden(request.getOrden());
+            }
+            
+            Fase faseActualizada = faseRepository.save(fase);
+            return ResponseEntity.ok(faseActualizada);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ EDITAR TAREA
+    @PutMapping("/tareas/{tareaId}")
+    public ResponseEntity<Tarea> editarTarea(@PathVariable Long tareaId, @RequestBody EditarTareaRequest request) {
+        try {
+            Tarea tarea = tareaRepository.findById(tareaId)
+                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada"));
+            
+            // Actualizar campos
+            if (request.getTitulo() != null && !request.getTitulo().isBlank()) {
+                tarea.setTitulo(request.getTitulo());
+            }
+            if (request.getDescripcion() != null) {
+                tarea.setDescripcion(request.getDescripcion());
+            }
+            if (request.getPrioridad() != null) {
+                tarea.setPrioridad(request.getPrioridad());
+            }
+            if (request.getResponsable() != null) {
+                tarea.setResponsable(request.getResponsable());
+            }
+            
+            Tarea tareaActualizada = tareaRepository.save(tarea);
+            return ResponseEntity.ok(tareaActualizada);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ========================================
+    // ENDPOINTS DE ELIMINACIÓN - AGREGAR AL ProyectoController.java
+    // ========================================
+
+    // ✅ ELIMINAR FASE
+    @DeleteMapping("/fases/{faseId}")
+    public ResponseEntity<Void> eliminarFase(@PathVariable Long faseId) {
+        try {
+            Fase fase = faseRepository.findById(faseId)
+                .orElseThrow(() -> new IllegalArgumentException("Fase no encontrada"));
+            
+            // Verificar si la fase tiene tareas
+            if (!fase.getTareas().isEmpty()) {
+                // Opción 1: No permitir eliminar fase con tareas
+                return ResponseEntity.badRequest().build();
+                
+                // Opción 2: Eliminar las tareas también (descomenta si prefieres esto)
+                // for (Tarea tarea : new ArrayList<>(fase.getTareas())) {
+                //     tareaRepository.delete(tarea);
+                // }
+            }
+            
+            faseRepository.delete(fase);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ ELIMINAR TAREA
+    @DeleteMapping("/tareas/{tareaId}")
+    public ResponseEntity<Void> eliminarTarea(@PathVariable Long tareaId) {
+        try {
+            Tarea tarea = tareaRepository.findById(tareaId)
+                .orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada"));
+            
+            // Remover la tarea de todas las fases que la contengan
+            for (Fase fase : new ArrayList<>(tarea.getFases())) {
+                fase.removerTarea(tarea);
+                faseRepository.save(fase);
+            }
+            
+            // Eliminar la tarea
+            tareaRepository.delete(tarea);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ ELIMINAR FASE CON FUERZA (elimina también las tareas)
+    @DeleteMapping("/fases/{faseId}/forzar")
+    public ResponseEntity<Void> eliminarFaseConFuerza(@PathVariable Long faseId) {
+        try {
+            Fase fase = faseRepository.findById(faseId)
+                .orElseThrow(() -> new IllegalArgumentException("Fase no encontrada"));
+            
+            // Eliminar todas las tareas de la fase
+            for (Tarea tarea : new ArrayList<>(fase.getTareas())) {
+                // Remover la tarea de otras fases también
+                for (Fase otraFase : new ArrayList<>(tarea.getFases())) {
+                    if (!otraFase.getIdFase().equals(faseId)) {
+                        otraFase.removerTarea(tarea);
+                        faseRepository.save(otraFase);
+                    }
+                }
+                tareaRepository.delete(tarea);
+            }
+            
+            // Eliminar la fase
+            faseRepository.delete(fase);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ========================================
+    // ENDPOINTS DE VERIFICACIÓN ANTES DE ELIMINAR
+    // ========================================
+
+    // ✅ VERIFICAR SI FASE SE PUEDE ELIMINAR
+    @GetMapping("/fases/{faseId}/puede-eliminar")
+    public ResponseEntity<PuedeEliminarResponse> verificarSiFasePuedeEliminar(@PathVariable Long faseId) {
+        try {
+            Fase fase = faseRepository.findById(faseId)
+                .orElseThrow(() -> new IllegalArgumentException("Fase no encontrada"));
+            
+            boolean puedeEliminar = fase.getTareas().isEmpty();
+            int numeroTareas = fase.getTareas().size();
+            
+            PuedeEliminarResponse response = new PuedeEliminarResponse(
+                puedeEliminar, 
+                puedeEliminar ? "La fase se puede eliminar" : "La fase tiene " + numeroTareas + " tarea(s)",
+                numeroTareas
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ VERIFICAR SI PROYECTO SE PUEDE ELIMINAR
+    @GetMapping("/{id}/puede-eliminar")
+    public ResponseEntity<PuedeEliminarResponse> verificarSiProyectoPuedeEliminar(@PathVariable Long id) {
+        try {
+            Proyecto proyecto = proyectoService.obtenerProyectoPorId(id);
+            
+            int numeroFases = proyecto.getFases().size();
+            int numeroTareas = proyecto.getTotalTareas();
+            
+            boolean puedeEliminar = numeroFases == 0 && numeroTareas == 0;
+            
+            String mensaje;
+            if (puedeEliminar) {
+                mensaje = "El proyecto se puede eliminar";
+            } else {
+                mensaje = "El proyecto tiene " + numeroFases + " fase(s) y " + numeroTareas + " tarea(s)";
+            }
+            
+            PuedeEliminarResponse response = new PuedeEliminarResponse(
+                puedeEliminar, 
+                mensaje,
+                numeroFases + numeroTareas
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
 
 // ========================================
@@ -649,4 +867,78 @@ class DashboardRecursoResponse {
     
     public ProyectoService.CargaTrabajoRecursoDTO getCargaTrabajo() { return cargaTrabajo; }
     public void setCargaTrabajo(ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo) { this.cargaTrabajo = cargaTrabajo; }
+}
+
+// ========================================
+// CLASES AUXILIARES PARA REQUESTS DE EDICIÓN
+// ========================================
+
+class EditarProyectoRequest {
+    private String nombre;
+    private String descripcion;
+    private String liderProyecto;
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public String getLiderProyecto() { return liderProyecto; }
+    public void setLiderProyecto(String liderProyecto) { this.liderProyecto = liderProyecto; }
+}
+
+class EditarFaseRequest {
+    private String nombre;
+    private Integer orden;
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public Integer getOrden() { return orden; }
+    public void setOrden(Integer orden) { this.orden = orden; }
+}
+
+class EditarTareaRequest {
+    private String titulo;
+    private String descripcion;
+    private Tarea.Prioridad prioridad;
+    private String responsable;
+    
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public Tarea.Prioridad getPrioridad() { return prioridad; }
+    public void setPrioridad(Tarea.Prioridad prioridad) { this.prioridad = prioridad; }
+    
+    public String getResponsable() { return responsable; }
+    public void setResponsable(String responsable) { this.responsable = responsable; }
+}
+
+// ========================================
+// CLASE AUXILIAR PARA RESPUESTA DE VERIFICACIÓN
+// ========================================
+
+class PuedeEliminarResponse {
+    private boolean puedeEliminar;
+    private String mensaje;
+    private int elementosRelacionados;
+    
+    public PuedeEliminarResponse(boolean puedeEliminar, String mensaje, int elementosRelacionados) {
+        this.puedeEliminar = puedeEliminar;
+        this.mensaje = mensaje;
+        this.elementosRelacionados = elementosRelacionados;
+    }
+    
+    public boolean isPuedeEliminar() { return puedeEliminar; }
+    public void setPuedeEliminar(boolean puedeEliminar) { this.puedeEliminar = puedeEliminar; }
+    
+    public String getMensaje() { return mensaje; }
+    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+    
+    public int getElementosRelacionados() { return elementosRelacionados; }
+    public void setElementosRelacionados(int elementosRelacionados) { this.elementosRelacionados = elementosRelacionados; }
 }

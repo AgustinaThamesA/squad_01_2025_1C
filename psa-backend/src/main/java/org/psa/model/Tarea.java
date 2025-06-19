@@ -209,4 +209,12 @@ public class Tarea {
     public boolean tieneResponsableAsignado() {
         return responsableRecurso != null || (responsable != null && !responsable.isBlank());
     }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 }

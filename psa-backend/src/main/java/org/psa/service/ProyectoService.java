@@ -790,4 +790,44 @@ public class ProyectoService {
         }
     }
 
+
+    @Transactional
+    public boolean eliminarFase(Long faseId) {
+        try {
+            if (faseRepository.existsById(faseId)) {
+                faseRepository.deleteById(faseId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar fase: " + e.getMessage());
+        }
+    }
+
+    @Transactional  
+    public boolean eliminarTarea(Long tareaId) {
+        try {
+            if (tareaRepository.existsById(tareaId)) {
+                // JPA maneja automáticamente la relación n:m
+                tareaRepository.deleteById(tareaId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar tarea: " + e.getMessage());
+        }
+    }
+
+    public boolean puedeEliminarFase(Long faseId) {
+        return faseRepository.findById(faseId)
+            .map(fase -> fase.getTareas().isEmpty())
+            .orElse(false);
+    }
+
+    public int contarTareasEnFase(Long faseId) {
+        return faseRepository.findById(faseId)
+            .map(fase -> fase.getTareas().size())
+            .orElse(0);
+    }
+
 }

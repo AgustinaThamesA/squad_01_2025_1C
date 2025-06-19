@@ -28,9 +28,9 @@ public class Fase {
     @JsonBackReference("proyecto-fases") // ✅ Este lado NO se serializa (evita bucle)
     private Proyecto proyecto;
     
-    // ✅ SOLUCIÓN: Agregar @JsonBackReference aquí
-    @ManyToMany(mappedBy = "fases", fetch = FetchType.LAZY)
-    @JsonBackReference // ✅ Este lado NO será serializado (evita el bucle)
+    @ManyToMany(mappedBy = "fases", fetch = FetchType.LAZY, 
+           cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JsonBackReference
     private List<Tarea> tareas;
     
     // Constructor por defecto (requerido por JPA)
@@ -125,4 +125,5 @@ public class Fase {
             return "Pendiente";
         }
     }
+
 }
