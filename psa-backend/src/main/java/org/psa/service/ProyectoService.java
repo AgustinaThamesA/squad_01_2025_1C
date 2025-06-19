@@ -830,4 +830,48 @@ public class ProyectoService {
             .orElse(0);
     }
 
+    @Transactional
+    public Riesgo actualizarRiesgo(Long riesgoId, String descripcion, 
+                                Riesgo.Probabilidad probabilidad, Riesgo.Impacto impacto) {
+        if (descripcion == null || descripcion.isBlank()) {
+            throw new IllegalArgumentException("La descripción del riesgo no puede ser vacía");
+        }
+        
+        Riesgo riesgo = riesgoRepository.findById(riesgoId)
+                .orElseThrow(() -> new IllegalArgumentException("Riesgo con ID " + riesgoId + " no encontrado"));
+        
+        // Actualizar campos
+        riesgo.setDescripcion(descripcion);
+        if (probabilidad != null) {
+            riesgo.setProbabilidad(probabilidad);
+        }
+        if (impacto != null) {
+            riesgo.setImpacto(impacto);
+        }
+        
+        return riesgoRepository.save(riesgo);
+    }
+
+    @Transactional
+    public boolean eliminarRiesgo(Long riesgoId) {
+        try {
+            if (riesgoRepository.existsById(riesgoId)) {
+                riesgoRepository.deleteById(riesgoId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar riesgo: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public Riesgo cambiarEstadoRiesgo(Long riesgoId, Riesgo.Estado nuevoEstado) {
+        Riesgo riesgo = riesgoRepository.findById(riesgoId)
+                .orElseThrow(() -> new IllegalArgumentException("Riesgo con ID " + riesgoId + " no encontrado"));
+        
+        riesgo.setEstado(nuevoEstado);
+        return riesgoRepository.save(riesgo);
+    }
+
 }

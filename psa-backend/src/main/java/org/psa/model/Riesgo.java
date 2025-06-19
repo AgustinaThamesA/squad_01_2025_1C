@@ -147,4 +147,5 @@ public class Riesgo {
     public boolean esRiesgoAlto() {
         return calcularNivelRiesgo() >= 6;
     }
+
 }

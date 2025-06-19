@@ -10,6 +10,7 @@ import org.psa.service.RecursoService;
 import org.psa.repository.FaseRepository;
 import org.psa.repository.TareaRepository;
 import java.util.ArrayList;
+import org.psa.repository.RiesgoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +28,8 @@ public class ProyectoController {
     private FaseRepository faseRepository;
     @Autowired
     private TareaRepository tareaRepository;
+    @Autowired
+    private RiesgoRepository riesgoRepository;
 
     // ========================================
     // GESTIÓN BÁSICA DE PROYECTOS
@@ -484,7 +487,7 @@ public class ProyectoController {
         try {
             Proyecto proyecto = proyectoService.obtenerProyectoPorId(id);
             
-            // Actualizar campos
+            // Actualizar campos existentes
             if (request.getNombre() != null && !request.getNombre().isBlank()) {
                 proyecto.setNombre(request.getNombre());
             }
@@ -493,6 +496,11 @@ public class ProyectoController {
             }
             if (request.getLiderProyecto() != null) {
                 proyecto.setLiderProyecto(request.getLiderProyecto());
+            }
+            
+            // ✅ AGREGAR ESTO: Actualizar estado si se envía
+            if (request.getEstado() != null) {
+                proyecto.setEstado(request.getEstado());
             }
             
             Proyecto proyectoActualizado = proyectoService.actualizarProyecto(proyecto);
@@ -680,6 +688,55 @@ public class ProyectoController {
             );
             
             return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/riesgos/{riesgoId}")
+    public ResponseEntity<Riesgo> editarRiesgo(@PathVariable Long riesgoId, @RequestBody EditarRiesgoRequest request) {
+        try {
+            Riesgo riesgo = proyectoService.actualizarRiesgo(
+                riesgoId,
+                request.getDescripcion(),
+                request.getProbabilidad(),
+                request.getImpacto()
+            );
+            return ResponseEntity.ok(riesgo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ ELIMINAR RIESGO
+    @DeleteMapping("/riesgos/{riesgoId}")
+    public ResponseEntity<Void> eliminarRiesgo(@PathVariable Long riesgoId) {
+        try {
+            boolean eliminado = proyectoService.eliminarRiesgo(riesgoId);
+            return eliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ✅ CAMBIAR ESTADO DE RIESGO (ACTIVAR/MITIGAR)
+    @PutMapping("/riesgos/{riesgoId}/estado")
+    public ResponseEntity<Riesgo> cambiarEstadoRiesgo(@PathVariable Long riesgoId, @RequestBody CambiarEstadoRiesgoRequest request) {
+        try {
+            Riesgo riesgo = proyectoService.cambiarEstadoRiesgo(riesgoId, request.getEstado());
+            return ResponseEntity.ok(riesgo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ✅ OBTENER RIESGO POR ID (para formularios de edición)
+    @GetMapping("/riesgos/{riesgoId}")
+    public ResponseEntity<Riesgo> obtenerRiesgoPorId(@PathVariable Long riesgoId) {
+        try {
+            Riesgo riesgo = riesgoRepository.findById(riesgoId)
+                .orElseThrow(() -> new IllegalArgumentException("Riesgo no encontrado"));
+            return ResponseEntity.ok(riesgo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -877,6 +934,7 @@ class EditarProyectoRequest {
     private String nombre;
     private String descripcion;
     private String liderProyecto;
+    private Proyecto.Estado estado;  // ✅ AGREGAR ESTA LÍNEA
     
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -886,6 +944,10 @@ class EditarProyectoRequest {
     
     public String getLiderProyecto() { return liderProyecto; }
     public void setLiderProyecto(String liderProyecto) { this.liderProyecto = liderProyecto; }
+    
+    // ✅ AGREGAR ESTOS MÉTODOS:
+    public Proyecto.Estado getEstado() { return estado; }
+    public void setEstado(Proyecto.Estado estado) { this.estado = estado; }
 }
 
 class EditarFaseRequest {
@@ -941,4 +1003,30 @@ class PuedeEliminarResponse {
     
     public int getElementosRelacionados() { return elementosRelacionados; }
     public void setElementosRelacionados(int elementosRelacionados) { this.elementosRelacionados = elementosRelacionados; }
+}
+
+// ========================================
+// CLASES AUXILIARES PARA REQUESTS
+// ========================================
+
+class EditarRiesgoRequest {
+    private String descripcion;
+    private Riesgo.Probabilidad probabilidad;
+    private Riesgo.Impacto impacto;
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public Riesgo.Probabilidad getProbabilidad() { return probabilidad; }
+    public void setProbabilidad(Riesgo.Probabilidad probabilidad) { this.probabilidad = probabilidad; }
+    
+    public Riesgo.Impacto getImpacto() { return impacto; }
+    public void setImpacto(Riesgo.Impacto impacto) { this.impacto = impacto; }
+}
+
+class CambiarEstadoRiesgoRequest {
+    private Riesgo.Estado estado;
+    
+    public Riesgo.Estado getEstado() { return estado; }
+    public void setEstado(Riesgo.Estado estado) { this.estado = estado; }
 }
