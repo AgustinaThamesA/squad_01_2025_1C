@@ -30,19 +30,24 @@ public class Tarea {
     @Enumerated(EnumType.STRING)
     private Prioridad prioridad;
     
+    // 🔄 MANTENER compatibilidad (opcional - puedes quitarlo después)
     private String responsable;
     
-    // ✅ SOLUCIÓN: Agregar @JsonManagedReference aquí
+    // ✅ NUEVA RELACIÓN CON RECURSO
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "responsable_recurso_id")
+    private Recurso responsableRecurso;
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "tarea_fase",
         joinColumns = @JoinColumn(name = "tarea_id"),
         inverseJoinColumns = @JoinColumn(name = "fase_id")
     )
-    @JsonManagedReference // ✅ Esta lado será serializado
+    @JsonManagedReference
     private List<Fase> fases;
 
-    // Tus enums originales (SIN CAMBIOS)
+    // Enums originales (SIN CAMBIOS)
     public enum Estado {
         PENDIENTE("Pendiente"),
         EN_PROGRESO("En Progreso"),
@@ -80,7 +85,7 @@ public class Tarea {
         this.fases = new ArrayList<>();
     }
 
-    // Tu constructor original
+    // ✅ CONSTRUCTOR ORIGINAL (para compatibilidad)
     public Tarea(String titulo, String descripcion, Prioridad prioridad, String responsable) {
         this();
         this.titulo = titulo;
@@ -89,37 +94,56 @@ public class Tarea {
         this.responsable = responsable;
         this.estado = Estado.PENDIENTE;
     }
+    
+    // ✅ NUEVO CONSTRUCTOR CON RECURSO
+    public Tarea(String titulo, String descripcion, Prioridad prioridad, Recurso responsableRecurso) {
+        this();
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.prioridad = prioridad;
+        this.responsableRecurso = responsableRecurso;
+        this.estado = Estado.PENDIENTE;
+        // Sincronizar con campo legacy
+        if (responsableRecurso != null) {
+            this.responsable = responsableRecurso.getNombreCompleto();
+        }
+    }
 
-    // Getters (todos iguales)
-    public Long getIdTarea() {
-        return idTarea;
+    // Getters existentes (sin cambios)
+    public Long getIdTarea() { return idTarea; }
+    public String getTitulo() { return titulo; }
+    public String getDescripcion() { return descripcion; }
+    public Estado getEstado() { return estado; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public LocalDate getFechaFinEstimada() { return fechaFinEstimada; }
+    public LocalDate getFechaFinReal() { return fechaFinReal; }
+    public Prioridad getPrioridad() { return prioridad; }
+    public List<Fase> getFases() { return fases; }
+    
+    // ✅ GETTERS/SETTERS PARA RECURSO
+    public Recurso getResponsableRecurso() { return responsableRecurso; }
+    
+    public void setResponsableRecurso(Recurso responsableRecurso) {
+        this.responsableRecurso = responsableRecurso;
+        // Sincronizar con campo legacy
+        if (responsableRecurso != null) {
+            this.responsable = responsableRecurso.getNombreCompleto();
+        } else {
+            this.responsable = null;
+        }
     }
-    public String getTitulo() {
-        return titulo;
-    }
-    public String getDescripcion() {
-        return descripcion;
-    }
-    public Estado getEstado() {
-        return estado;
-    }
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
-    public LocalDate getFechaFinEstimada() {
-        return fechaFinEstimada;
-    }
-    public LocalDate getFechaFinReal() {
-        return fechaFinReal;
-    }
-    public Prioridad getPrioridad() {
-        return prioridad;
-    }
+    
+    // ✅ GETTER HÍBRIDO PARA COMPATIBILIDAD
     public String getResponsable() {
+        // Priorizar recurso si existe, sino retornar string legacy
+        if (responsableRecurso != null) {
+            return responsableRecurso.getNombreCompleto();
+        }
         return responsable;
     }
-    public List<Fase> getFases() {
-        return fases;
+    
+    public void setResponsable(String responsable) {
+        this.responsable = responsable;
     }
 
     // Setters y métodos de negocio (SIN CAMBIOS)
@@ -128,9 +152,6 @@ public class Tarea {
     }
     public void setPrioridad(Prioridad prioridad) {
         this.prioridad = prioridad;
-    }
-    public void setResponsable(String responsable) {
-        this.responsable = responsable;
     }
 
     public void planificarFechas(LocalDate inicio, LocalDate fin) {
@@ -174,5 +195,18 @@ public class Tarea {
             .map(fase -> fase.getNombre().split(":")[0].trim())
             .reduce((f1, f2) -> f1 + ", " + f2)
             .orElse("");
+    }
+    
+    // ✅ MÉTODOS DE UTILIDAD PARA RECURSOS
+    public String getResponsableNombreCompleto() {
+        return getResponsable(); // Usa el getter híbrido
+    }
+    
+    public String getResponsableRecursoId() {
+        return responsableRecurso != null ? responsableRecurso.getId() : null;
+    }
+    
+    public boolean tieneResponsableAsignado() {
+        return responsableRecurso != null || (responsable != null && !responsable.isBlank());
     }
 }

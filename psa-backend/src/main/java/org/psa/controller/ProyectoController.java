@@ -5,6 +5,8 @@ import org.psa.service.ProyectoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
+import org.psa.service.RecursoService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +18,8 @@ public class ProyectoController {
 
     @Autowired
     private ProyectoService proyectoService;
+    @Autowired  
+    private RecursoService recursoService;
 
     // ========================================
     // GESTIÓN BÁSICA DE PROYECTOS
@@ -271,6 +275,198 @@ public class ProyectoController {
         return proyectoService.guardarProyecto(proyecto);
     }
 
+    @PostMapping("/con-recurso")
+    public ResponseEntity<Proyecto> crearProyectoConRecurso(@RequestBody CrearProyectoConRecursoRequest request) {
+        try {
+            Proyecto proyecto = proyectoService.crearProyectoConRecurso(
+                request.getNombre(),
+                request.getDescripcion(), 
+                request.getLiderRecursoId()
+            );
+            return ResponseEntity.ok(proyecto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}/asignar-lider")
+    public ResponseEntity<Proyecto> asignarLiderRecurso(@PathVariable Long id, @RequestBody AsignarLiderRequest request) {
+        try {
+            Proyecto proyecto = proyectoService.asignarLiderRecurso(id, request.getLiderRecursoId());
+            return ResponseEntity.ok(proyecto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}/remover-lider")
+    public ResponseEntity<Proyecto> removerLiderRecurso(@PathVariable Long id) {
+        try {
+            Proyecto proyecto = proyectoService.removerLiderRecurso(id);
+            return ResponseEntity.ok(proyecto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ========================================
+    // CONSULTAS POR RECURSOS
+    // ========================================
+
+    @GetMapping("/lider/{liderRecursoId}")
+    public ResponseEntity<List<Proyecto>> obtenerProyectosPorLider(@PathVariable String liderRecursoId) {
+        try {
+            List<Proyecto> proyectos = proyectoService.obtenerProyectosPorLider(liderRecursoId);
+            return ResponseEntity.ok(proyectos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/sin-lider")
+    public List<Proyecto> obtenerProyectosSinLider() {
+        return proyectoService.obtenerProyectosSinLider();
+    }
+
+    @GetMapping("/estadisticas-recursos")
+    public ProyectoService.EstadisticasRecursosProyectoDTO obtenerEstadisticasRecursos() {
+        return proyectoService.obtenerEstadisticasRecursosEnProyectos();
+    }
+
+    // ========================================
+    // GESTIÓN DE TAREAS CON RECURSOS
+    // ========================================
+
+    @PostMapping("/{proyectoId}/tareas/con-recurso")
+    public ResponseEntity<Tarea> crearTareaConRecurso(@PathVariable Long proyectoId, @RequestBody CrearTareaConRecursoRequest request) {
+        try {
+            Tarea tarea = proyectoService.crearTareaConRecurso(
+                proyectoId,
+                request.getFaseId(),
+                request.getTitulo(),
+                request.getDescripcion(),
+                request.getPrioridad(),
+                request.getResponsableRecursoId()
+            );
+            return ResponseEntity.ok(tarea);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/tareas/{tareaId}/asignar-responsable")
+    public ResponseEntity<Tarea> asignarResponsableRecurso(@PathVariable Long tareaId, @RequestBody AsignarResponsableRequest request) {
+        try {
+            Tarea tarea = proyectoService.asignarResponsableRecurso(tareaId, request.getResponsableRecursoId());
+            return ResponseEntity.ok(tarea);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/tareas/{tareaId}/remover-responsable")
+    public ResponseEntity<Tarea> removerResponsableRecurso(@PathVariable Long tareaId) {
+        try {
+            Tarea tarea = proyectoService.removerResponsableRecurso(tareaId);
+            return ResponseEntity.ok(tarea);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ========================================
+    // CONSULTAS POR RECURSOS EN TAREAS
+    // ========================================
+
+    @GetMapping("/tareas/responsable/{responsableRecursoId}")
+    public ResponseEntity<List<Tarea>> obtenerTareasPorResponsable(@PathVariable String responsableRecursoId) {
+        try {
+            List<Tarea> tareas = proyectoService.obtenerTareasPorResponsable(responsableRecursoId);
+            return ResponseEntity.ok(tareas);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/tareas/sin-responsable")
+    public List<Tarea> obtenerTareasSinResponsable() {
+        return proyectoService.obtenerTareasSinResponsable();
+    }
+
+    @GetMapping("/{proyectoId}/tareas/responsable/{responsableRecursoId}")
+    public ResponseEntity<List<Tarea>> obtenerTareasDelRecursoEnProyecto(@PathVariable Long proyectoId, @PathVariable String responsableRecursoId) {
+        try {
+            List<Tarea> tareas = proyectoService.obtenerTareasDelRecursoEnProyecto(responsableRecursoId, proyectoId);
+            return ResponseEntity.ok(tareas);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ========================================
+    // ESTADÍSTICAS Y REPORTES DE RECURSOS
+    // ========================================
+
+    @GetMapping("/recursos/{recursoId}/carga-trabajo")
+    public ResponseEntity<ProyectoService.CargaTrabajoRecursoDTO> obtenerCargaTrabajoRecurso(@PathVariable String recursoId) {
+        try {
+            ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo = proyectoService.obtenerCargaTrabajoRecurso(recursoId);
+            return ResponseEntity.ok(cargaTrabajo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/recursos/carga-trabajo")
+    public List<ProyectoService.CargaTrabajoRecursoDTO> obtenerCargaTrabajoTodosLosRecursos() {
+        return proyectoService.obtenerCargaTrabajoTodosLosRecursos();
+    }
+
+    @GetMapping("/recursos/disponibles-tareas")
+    public List<Recurso> obtenerRecursosDisponiblesParaTareas() {
+        return proyectoService.obtenerRecursosDisponiblesParaTareas();
+    }
+
+    @GetMapping("/tareas/estadisticas-recursos")
+    public ProyectoService.EstadisticasRecursosTareasDTO obtenerEstadisticasRecursosEnTareas() {
+        return proyectoService.obtenerEstadisticasRecursosEnTareas();
+    }
+
+    // ========================================
+    // ENDPOINTS ESPECIALES PARA DASHBOARDS
+    // ========================================
+
+    @GetMapping("/dashboard/recurso/{recursoId}")
+    public ResponseEntity<DashboardRecursoResponse> obtenerDashboardRecurso(@PathVariable String recursoId) {
+        try {
+            // Obtener datos del recurso
+            Recurso recurso = recursoService.obtenerRecursoPorId(recursoId);
+            
+            // Obtener proyectos donde es líder
+            List<Proyecto> proyectosLiderados = proyectoService.obtenerProyectosPorLider(recursoId);
+            
+            // Obtener carga de trabajo
+            ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo = proyectoService.obtenerCargaTrabajoRecurso(recursoId);
+            
+            DashboardRecursoResponse dashboard = new DashboardRecursoResponse(
+                recurso,
+                proyectosLiderados,
+                cargaTrabajo
+            );
+            
+            return ResponseEntity.ok(dashboard);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/dashboard/recursos-sobrecargados")
+    public List<ProyectoService.CargaTrabajoRecursoDTO> obtenerRecursosSobrecargados() {
+        return proyectoService.obtenerCargaTrabajoTodosLosRecursos().stream()
+            .filter(carga -> carga.getTareasActivas() > 3) // Umbral configurable
+            .collect(Collectors.toList());
+    }
+
 }
 
 // ========================================
@@ -379,4 +575,78 @@ class CrearRiesgoRequest {
     
     public Riesgo.Impacto getImpacto() { return impacto; }
     public void setImpacto(Riesgo.Impacto impacto) { this.impacto = impacto; }
+}
+
+class CrearProyectoConRecursoRequest {
+    private String nombre;
+    private String descripcion;
+    private String liderRecursoId;
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public String getLiderRecursoId() { return liderRecursoId; }
+    public void setLiderRecursoId(String liderRecursoId) { this.liderRecursoId = liderRecursoId; }
+}
+
+class AsignarLiderRequest {
+    private String liderRecursoId;
+    
+    public String getLiderRecursoId() { return liderRecursoId; }
+    public void setLiderRecursoId(String liderRecursoId) { this.liderRecursoId = liderRecursoId; }
+}
+
+class CrearTareaConRecursoRequest {
+    private String titulo;
+    private String descripcion;
+    private Tarea.Prioridad prioridad;
+    private String responsableRecursoId;
+    private Long faseId;
+    
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public Tarea.Prioridad getPrioridad() { return prioridad; }
+    public void setPrioridad(Tarea.Prioridad prioridad) { this.prioridad = prioridad; }
+    
+    public String getResponsableRecursoId() { return responsableRecursoId; }
+    public void setResponsableRecursoId(String responsableRecursoId) { this.responsableRecursoId = responsableRecursoId; }
+    
+    public Long getFaseId() { return faseId; }
+    public void setFaseId(Long faseId) { this.faseId = faseId; }
+}
+
+class AsignarResponsableRequest {
+    private String responsableRecursoId;
+    
+    public String getResponsableRecursoId() { return responsableRecursoId; }
+    public void setResponsableRecursoId(String responsableRecursoId) { this.responsableRecursoId = responsableRecursoId; }
+}
+
+class DashboardRecursoResponse {
+    private Recurso recurso;
+    private List<Proyecto> proyectosLiderados;
+    private ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo;
+    
+    public DashboardRecursoResponse(Recurso recurso, List<Proyecto> proyectosLiderados, 
+                                   ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo) {
+        this.recurso = recurso;
+        this.proyectosLiderados = proyectosLiderados;
+        this.cargaTrabajo = cargaTrabajo;
+    }
+    
+    public Recurso getRecurso() { return recurso; }
+    public void setRecurso(Recurso recurso) { this.recurso = recurso; }
+    
+    public List<Proyecto> getProyectosLiderados() { return proyectosLiderados; }
+    public void setProyectosLiderados(List<Proyecto> proyectosLiderados) { this.proyectosLiderados = proyectosLiderados; }
+    
+    public ProyectoService.CargaTrabajoRecursoDTO getCargaTrabajo() { return cargaTrabajo; }
+    public void setCargaTrabajo(ProyectoService.CargaTrabajoRecursoDTO cargaTrabajo) { this.cargaTrabajo = cargaTrabajo; }
 }

@@ -27,19 +27,24 @@ public class Proyecto {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
+    // 🔄 MANTENER compatibilidad (opcional - puedes quitarlo después)
     private String liderProyecto;
     
-    // ✅ SOLUCIÓN: Agregar @JsonManagedReference para controlar la serialización
+    // ✅ NUEVA RELACIÓN CON RECURSO
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lider_recurso_id")
+    private Recurso liderRecurso;
+    
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference("proyecto-fases") // ✅ Este lado SÍ se serializa
+    @JsonManagedReference("proyecto-fases")
     private List<Fase> fases;
     
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference("proyecto-riesgos") // ✅ Este lado SÍ se serializa
+    @JsonManagedReference("proyecto-riesgos")
     private List<Riesgo> riesgos;
     
     @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference("proyecto-reportes") // ✅ Este lado SÍ se serializa
+    @JsonManagedReference("proyecto-reportes")
     private List<ReporteEstado> reportes;
 
     // Enum Estado (sin cambios)
@@ -64,7 +69,7 @@ public class Proyecto {
         this.reportes = new ArrayList<>();
     }
 
-    // Tu constructor original
+    // ✅ CONSTRUCTOR ORIGINAL (para compatibilidad)
     public Proyecto(String nombre, String descripcion, String liderProyecto) {
         this();
         this.nombre = nombre;
@@ -72,52 +77,62 @@ public class Proyecto {
         this.estado = Estado.ACTIVO;
         this.liderProyecto = liderProyecto;
     }
+    
+    // ✅ NUEVO CONSTRUCTOR CON RECURSO
+    public Proyecto(String nombre, String descripcion, Recurso liderRecurso) {
+        this();
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.estado = Estado.ACTIVO;
+        this.liderRecurso = liderRecurso;
+        // Sincronizar con campo legacy
+        if (liderRecurso != null) {
+            this.liderProyecto = liderRecurso.getNombreCompleto();
+        }
+    }
 
-    // Getters
-    public Long getIdProyecto() {
-        return idProyecto;
+    // Getters existentes (sin cambios)
+    public Long getIdProyecto() { return idProyecto; }
+    public void setIdProyecto(Long idProyecto) { this.idProyecto = idProyecto; }
+    public String getNombre() { return nombre; }
+    public String getDescripcion() { return descripcion; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public LocalDate getFechaFinEstimada() { return fechaFinEstimada; }
+    public LocalDate getFechaFinReal() { return fechaFinReal; }
+    public Estado getEstado() { return estado; }
+    public List<Fase> getFases() { return fases; }
+    public List<Riesgo> getRiesgos() { return riesgos; }
+    public List<ReporteEstado> getReportes() { return reportes; }
+    
+    // ✅ GETTERS/SETTERS PARA RECURSO
+    public Recurso getLiderRecurso() { return liderRecurso; }
+    
+    public void setLiderRecurso(Recurso liderRecurso) {
+        this.liderRecurso = liderRecurso;
+        // Sincronizar con campo legacy
+        if (liderRecurso != null) {
+            this.liderProyecto = liderRecurso.getNombreCompleto();
+        } else {
+            this.liderProyecto = null;
+        }
     }
     
-    public void setIdProyecto(Long idProyecto) {
-        this.idProyecto = idProyecto;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public String getDescripcion() {
-        return descripcion;
-    }
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
-    public LocalDate getFechaFinEstimada() {
-        return fechaFinEstimada;
-    }
-    public LocalDate getFechaFinReal() {
-        return fechaFinReal;
-    }
-    public Estado getEstado() {
-        return estado;
-    }
+    // ✅ GETTER HÍBRIDO PARA COMPATIBILIDAD
     public String getLiderProyecto() {
+        // Priorizar recurso si existe, sino retornar string legacy
+        if (liderRecurso != null) {
+            return liderRecurso.getNombreCompleto();
+        }
         return liderProyecto;
     }
-    public List<Fase> getFases() {
-        return fases;
-    }
-    public List<Riesgo> getRiesgos() {
-        return riesgos;
-    }
-    public List<ReporteEstado> getReportes() {
-        return reportes;
+    
+    public void setLiderProyecto(String liderProyecto) {
+        this.liderProyecto = liderProyecto;
     }
 
     // Setters y métodos de negocio (SIN CAMBIOS)
     public void setEstado(Estado estado) {
         this.estado = estado;
-    }
-    public void setLiderProyecto(String liderProyecto) {
-        this.liderProyecto = liderProyecto;
     }
 
     public void planificarFechas(LocalDate inicio, LocalDate fin) {
@@ -176,13 +191,26 @@ public class Proyecto {
             .count();
     }
     
+    // ✅ MÉTODOS DE UTILIDAD PARA RECURSOS
+    public String getLiderNombreCompleto() {
+        return getLiderProyecto(); // Usa el getter híbrido
+    }
+    
+    public String getLiderRecursoId() {
+        return liderRecurso != null ? liderRecurso.getId() : null;
+    }
+    
+    public boolean tieneLiderAsignado() {
+        return liderRecurso != null || (liderProyecto != null && !liderProyecto.isBlank());
+    }
+    
     @Override
     public String toString() {
         return "Proyecto{" +
                 "idProyecto=" + idProyecto +
                 ", nombre='" + nombre + '\'' +
                 ", estado=" + estado +
-                ", liderProyecto='" + liderProyecto + '\'' +
+                ", lider='" + getLiderNombreCompleto() + '\'' +
                 '}';
     }
 }
