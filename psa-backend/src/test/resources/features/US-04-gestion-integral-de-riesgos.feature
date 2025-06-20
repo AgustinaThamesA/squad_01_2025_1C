@@ -1,7 +1,7 @@
 Feature: Gestión integral de riesgos del proyecto
-# Como gerente de proyecto
-# Quiero poder registrar, clasificar y gestionar los riesgos de un proyecto
-# Para anticiparme a posibles problemas y mitigar su impacto en tiempos, costos o funcionalidades
+  # Como gerente de proyecto
+  # Quiero poder registrar, clasificar y gestionar los riesgos de un proyecto
+  # Para anticiparme a posibles problemas y mitigar su impacto en tiempos, costos o funcionalidades
 
   Scenario: Registrar un nuevo riesgo
     Given que soy gerente de proyecto de un proyecto activo
