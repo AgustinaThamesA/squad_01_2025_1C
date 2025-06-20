@@ -795,7 +795,21 @@ public class ProyectoService {
     public boolean eliminarFase(Long faseId) {
         try {
             if (faseRepository.existsById(faseId)) {
+                // 🔧 OBTENER EL ID DEL PROYECTO ANTES DE ELIMINAR
+                Long proyectoId = faseRepository.findById(faseId)
+                    .map(fase -> fase.getProyecto().getIdProyecto())
+                    .orElse(null);
+                
                 faseRepository.deleteById(faseId);
+                
+                // 🔧 REFRESCAR EL PROYECTO PARA ACTUALIZAR getTotalTareas()
+                if (proyectoId != null) {
+                    proyectoRepository.findById(proyectoId).ifPresent(proyecto -> {
+                        // Forzar la recarga de las fases
+                        proyecto.getFases().size(); // Esto dispara el lazy loading
+                    });
+                }
+                
                 return true;
             }
             return false;
