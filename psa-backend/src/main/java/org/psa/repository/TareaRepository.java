@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
+import org.psa.model.Ticket.EstadoTicket;
 
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
@@ -21,6 +22,11 @@ public interface TareaRepository extends JpaRepository<Tarea, Long> {
     
     // Tareas por prioridad
     List<Tarea> findByPrioridad(Tarea.Prioridad prioridad);
+
+    List<Tarea> findByTicketAsociadoIsNotNull();
+    List<Tarea> findByTicketAsociado_Id(Long ticketId);
+    List<Tarea> findByTicketAsociado_Estado(EstadoTicket estadoTicket);
+    long countByTicketAsociado_Id(Long ticketId);
     
     // Tareas vencidas (tu lógica original)
     @Query("SELECT t FROM Tarea t WHERE t.fechaFinEstimada < ?1 AND t.estado != 'COMPLETADA'")

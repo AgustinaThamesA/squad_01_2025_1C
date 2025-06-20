@@ -30,10 +30,8 @@ public class Tarea {
     @Enumerated(EnumType.STRING)
     private Prioridad prioridad;
     
-    // 🔄 MANTENER compatibilidad (opcional - puedes quitarlo después)
     private String responsable;
     
-    // ✅ NUEVA RELACIÓN CON RECURSO
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "responsable_recurso_id")
     private Recurso responsableRecurso;
@@ -47,7 +45,13 @@ public class Tarea {
     @JsonManagedReference
     private List<Fase> fases;
 
-    // Enums originales (SIN CAMBIOS)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id")
+    private Ticket ticketAsociado;
+
+    public Ticket getTicketAsociado() { return ticketAsociado; }
+    public void setTicketAsociado(Ticket ticketAsociado) { this.ticketAsociado = ticketAsociado; }
+
     public enum Estado {
         PENDIENTE("Pendiente"),
         EN_PROGRESO("En Progreso"),
@@ -80,7 +84,6 @@ public class Tarea {
         }
     }
 
-    // Constructor por defecto (requerido por JPA)
     public Tarea() {
         this.fases = new ArrayList<>();
     }
