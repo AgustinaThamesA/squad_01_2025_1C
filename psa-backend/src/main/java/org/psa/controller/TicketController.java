@@ -145,18 +145,34 @@ public class TicketController {
     }
     
     // ========================================
-    // 8. PARA SOPORTE: Obtener tareas de un ticket específico
+    // 8. PARA SOPORTE: Obtener tareas de un ticket específico (por ID externo)
     // ========================================
-    @GetMapping("/{ticketId}/tareas")
-    public ResponseEntity<List<TareaConTicketDTO>> getTareasDelTicket(@PathVariable Long ticketId) {
+    @GetMapping("/externo/{ticketExternoId}/tareas")
+    public ResponseEntity<List<TareaConTicketDTO>> getTareasDelTicketExterno(@PathVariable String ticketExternoId) {
         try {
-            // Filtrar solo las tareas de este ticket específico
+            // Buscar ticket por su ID externo (internalId de soporte)
             List<TareaConTicketDTO> todasLasTareas = ticketService.getTareasConTickets();
             List<TareaConTicketDTO> tareasDelTicket = todasLasTareas.stream()
-                .filter(tarea -> tarea.getTicketId().equals(ticketId))
+                .filter(tarea -> tarea.getTicketExternoId() != null && 
+                               tarea.getTicketExternoId().equals(ticketExternoId))
                 .toList();
             
             return ResponseEntity.ok(tareasDelTicket);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    // ========================================
+    // 8b. PARA SOPORTE: Obtener ticket por ID externo  
+    // ========================================
+    @GetMapping("/externo/{ticketExternoId}")
+    public ResponseEntity<TicketResponseDTO> obtenerTicketPorIdExterno(@PathVariable String ticketExternoId) {
+        try {
+            TicketResponseDTO response = ticketService.obtenerTicketPorIdExterno(ticketExternoId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

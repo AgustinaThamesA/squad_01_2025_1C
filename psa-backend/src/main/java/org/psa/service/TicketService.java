@@ -239,6 +239,19 @@ public class TicketService {
     }
     
     /**
+     * 1b. OBTENER TICKET POR ID EXTERNO - Para soporte
+     */
+    public TicketResponseDTO obtenerTicketPorIdExterno(String ticketExternoId) {
+        List<Ticket> tickets = ticketRepository.findAll();
+        Ticket ticket = tickets.stream()
+            .filter(t -> t.getTicketExternoId() != null && 
+                        t.getTicketExternoId().equals(ticketExternoId))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Ticket no encontrado con ID externo: " + ticketExternoId));
+        return mapToResponseDTO(ticket);
+    }
+    
+    /**
      * 2. ASIGNAR TAREAS AL TICKET - El core de la integración
      */
     public TicketResponseDTO asignarTareasAlTicket(Long ticketId, List<Long> tareaIds) {
