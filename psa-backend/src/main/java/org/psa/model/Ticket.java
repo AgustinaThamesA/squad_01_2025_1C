@@ -1,5 +1,6 @@
 package org.psa.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -67,8 +68,9 @@ public class Ticket {
     @Column(nullable = false)
     private EstadoTicket estado;
     
-    // RELACIÓN: Un ticket puede tener múltiples tareas asignadas
+    // ✅ AQUÍ ESTÁ LA OTRA PARTE - AGREGAR @JsonManagedReference
     @OneToMany(mappedBy = "ticketAsociado", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference  // ✅ ESTO COMPLETA EL CICLO
     private List<Tarea> tareasAsignadas = new ArrayList<>();
     
     // CONSTRUCTORES

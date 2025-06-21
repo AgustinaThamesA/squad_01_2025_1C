@@ -1,6 +1,7 @@
 package org.psa.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,8 +46,10 @@ public class Tarea {
     @JsonManagedReference
     private List<Fase> fases;
 
+    // ✅ AQUÍ ESTÁ EL PROBLEMA - AGREGAR @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id")
+    @JsonBackReference  // ✅ ESTO ROMPE EL CICLO
     private Ticket ticketAsociado;
 
     public Ticket getTicketAsociado() { return ticketAsociado; }
