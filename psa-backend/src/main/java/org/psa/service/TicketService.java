@@ -33,7 +33,7 @@ public class TicketService {
     private TareaRepository tareaRepository;
     
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String SOPORTE_API_URL = "https://app-modulo-soporte-dev.onrender.com/support-module/ticket/data";
+    private static final String SOPORTE_API_URL = "https://app-modulo-soporte-dev.onrender.com/support-module/ticket/state/uncompleted";
     
     // ========================================
     // SINCRONIZACIÓN CON API DE SOPORTE
