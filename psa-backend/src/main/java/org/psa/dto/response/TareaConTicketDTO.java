@@ -17,8 +17,10 @@ public class TareaConTicketDTO {
     private Long proyectoId;
     private String proyectoNombre;
     
-    // Info del TICKET  
-    private Long ticketId;
+    // Info del TICKET (con IDs de soporte)
+    private Long ticketId;              // Tu ID interno
+    private String ticketExternoId;     // ✅ Su internalId ("1")
+    private String ticketCodigo;        // ✅ Su código ("SAP-1")
     private String ticketNombre;
     private String ticketPrioridad;
     private String ticketSeveridad;
@@ -58,6 +60,12 @@ public class TareaConTicketDTO {
     
     public Long getTicketId() { return ticketId; }
     public void setTicketId(Long ticketId) { this.ticketId = ticketId; }
+    
+    public String getTicketExternoId() { return ticketExternoId; }
+    public void setTicketExternoId(String ticketExternoId) { this.ticketExternoId = ticketExternoId; }
+    
+    public String getTicketCodigo() { return ticketCodigo; }
+    public void setTicketCodigo(String ticketCodigo) { this.ticketCodigo = ticketCodigo; }
     
     public String getTicketNombre() { return ticketNombre; }
     public void setTicketNombre(String ticketNombre) { this.ticketNombre = ticketNombre; }

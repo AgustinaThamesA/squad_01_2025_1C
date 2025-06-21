@@ -5,13 +5,13 @@ import org.psa.dto.response.TareaBasicaDTO;
 import org.psa.dto.response.TareaConTicketDTO;
 import org.psa.dto.response.TicketResponseDTO;
 import org.psa.model.Tarea;
-import org.psa.model.Fase;
 import org.psa.model.Ticket;
 import org.psa.repository.TareaRepository;
 import org.psa.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.psa.model.Fase;
 
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
@@ -63,7 +63,8 @@ public class TicketService {
             // 3. Procesar tickets de soporte (crear/actualizar)
             for (TicketSoporteDTO ticketSoporte : ticketsSoporte) {
                 Optional<Ticket> ticketExistente = ticketsActuales.stream()
-                    .filter(t -> t.getId().equals(ticketSoporte.getId()))
+                    .filter(t -> t.getTicketExternoId() != null && 
+                               t.getTicketExternoId().equals(ticketSoporte.getInternalId().toString()))
                     .findFirst();
                 
                 if (ticketExistente.isPresent()) {
@@ -78,12 +79,13 @@ public class TicketService {
             }
             
             // 4. Eliminar tickets que ya no existen en soporte
-            List<Long> idsTicketsSoporte = ticketsSoporte.stream()
-                .map(TicketSoporteDTO::getId)
+            List<String> internalIdsTicketsSoporte = ticketsSoporte.stream()
+                .map(t -> t.getInternalId().toString())
                 .collect(Collectors.toList());
             
             for (Ticket ticketLocal : ticketsActuales) {
-                if (!idsTicketsSoporte.contains(ticketLocal.getId())) {
+                if (ticketLocal.getTicketExternoId() != null && 
+                    !internalIdsTicketsSoporte.contains(ticketLocal.getTicketExternoId())) {
                     // Ticket eliminado en soporte, eliminar de nuestra BD
                     eliminarTicket(ticketLocal.getId());
                     eliminados++;
@@ -105,16 +107,18 @@ public class TicketService {
      */
     private Ticket crearTicketDesdeSync(TicketSoporteDTO ticketSoporte) {
         Ticket ticket = new Ticket();
-        ticket.setId(ticketSoporte.getId()); // Usar el ID de soporte
+        // NO usar el ID de soporte como nuestro ID - usar internalId como referencia
+        ticket.setTicketExternoId(ticketSoporte.getInternalId().toString());
+        ticket.setCodigo(ticketSoporte.getCodigo());
         ticket.setNombre(ticketSoporte.getNombre());
         ticket.setPrioridad(mapearPrioridad(ticketSoporte.getPrioridad()));
         ticket.setSeveridad(mapearSeveridad(ticketSoporte.getSeveridad()));
         ticket.setIdCliente(ticketSoporte.getIdCliente());
         ticket.setIdProducto(ticketSoporte.getIdProducto());
         ticket.setVersion(ticketSoporte.getVersion());
-        ticket.setDescripcion(ticketSoporte.getDescripcion());
+        ticket.setDescripcion(ticketSoporte.getDescripcion()); // Podría ser null en su API
         ticket.setIdResponsable(ticketSoporte.getIdResponsable());
-        // Mantener estado actual si ya tiene tareas asignadas
+        // fechaCreacion se asigna automáticamente
         ticket.setEstado(Ticket.EstadoTicket.RECIBIDO);
         
         return ticketRepository.save(ticket);
@@ -124,6 +128,7 @@ public class TicketService {
      * Actualizar ticket existente
      */
     private void actualizarTicketExistente(Ticket ticketLocal, TicketSoporteDTO ticketSoporte) {
+        ticketLocal.setCodigo(ticketSoporte.getCodigo());
         ticketLocal.setNombre(ticketSoporte.getNombre());
         ticketLocal.setPrioridad(mapearPrioridad(ticketSoporte.getPrioridad()));
         ticketLocal.setSeveridad(mapearSeveridad(ticketSoporte.getSeveridad()));
@@ -161,19 +166,27 @@ public class TicketService {
     
     // DTO para recibir datos de la API de soporte
     public static class TicketSoporteDTO {
-        private Long id;
+        private Long internalId;  // ✅ Usar internalId como clave primaria
+        private String codigo;    // ✅ Agregar código
         private String nombre;
+        private String descripcion;  // ✅ Agregar descripcion (puede ser null)
         private String prioridad;
         private String severidad;
         private String idCliente;
+        private String nombreCliente;  // ✅ Info adicional
         private String idProducto;
+        private String nombreProducto; // ✅ Info adicional
+        private String idVersion;      // ✅ Cambiar de version a idVersion
         private String version;
-        private String descripcion;
         private String idResponsable;
+        private String nombreResponsable; // ✅ Info adicional
         
         // Getters y setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
+        public Long getInternalId() { return internalId; }
+        public void setInternalId(Long internalId) { this.internalId = internalId; }
+        
+        public String getCodigo() { return codigo; }
+        public void setCodigo(String codigo) { this.codigo = codigo; }
         
         public String getNombre() { return nombre; }
         public void setNombre(String nombre) { this.nombre = nombre; }
@@ -187,17 +200,29 @@ public class TicketService {
         public String getIdCliente() { return idCliente; }
         public void setIdCliente(String idCliente) { this.idCliente = idCliente; }
         
+        public String getNombreCliente() { return nombreCliente; }
+        public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
+        
         public String getIdProducto() { return idProducto; }
         public void setIdProducto(String idProducto) { this.idProducto = idProducto; }
         
-        public String getVersion() { return version; }
-        public void setVersion(String version) { this.version = version; }
+        public String getNombreProducto() { return nombreProducto; }
+        public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
+        
+        public String getIdVersion() { return idVersion; }
+        public void setIdVersion(String idVersion) { this.idVersion = idVersion; }
         
         public String getDescripcion() { return descripcion; }
         public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
         
+        public String getVersion() { return version; }
+        public void setVersion(String version) { this.version = version; }
+        
         public String getIdResponsable() { return idResponsable; }
         public void setIdResponsable(String idResponsable) { this.idResponsable = idResponsable; }
+        
+        public String getNombreResponsable() { return nombreResponsable; }
+        public void setNombreResponsable(String nombreResponsable) { this.nombreResponsable = nombreResponsable; }
     }
     
     // ========================================
@@ -330,6 +355,8 @@ public class TicketService {
     private TicketResponseDTO mapToResponseDTO(Ticket ticket) {
         TicketResponseDTO dto = new TicketResponseDTO();
         dto.setId(ticket.getId());
+        dto.setTicketExternoId(ticket.getTicketExternoId());  // ✅ Su internalId
+        dto.setCodigo(ticket.getCodigo());  // ✅ Su código SAP-1
         dto.setNombre(ticket.getNombre());
         dto.setPrioridad(ticket.getPrioridad().name());
         dto.setSeveridad(ticket.getSeveridad().name());
@@ -342,7 +369,7 @@ public class TicketService {
         dto.setFechaCreacion(ticket.getFechaCreacion());
         
         // Info de asignación
-        dto.setAsignado(ticket.tieneTagreasAsignadas());
+        dto.setAsignado(ticket.tieneTareasAsignadas());  // ✅ Corregir typo
         dto.setCantidadTareasAsignadas(ticket.getCantidadTareasAsignadas());
         
         // Mapear tareas asignadas
@@ -376,10 +403,12 @@ public class TicketService {
             }
         }
         
-        // Info del TICKET
+        // Info del TICKET (con identificadores de soporte)
         Ticket ticket = tarea.getTicketAsociado();
         if (ticket != null) {
-            dto.setTicketId(ticket.getId());
+            dto.setTicketId(ticket.getId());                    // Tu ID interno
+            dto.setTicketExternoId(ticket.getTicketExternoId()); // ✅ Su internalId
+            dto.setTicketCodigo(ticket.getCodigo());            // ✅ Su código SAP-1
             dto.setTicketNombre(ticket.getNombre());
             dto.setTicketPrioridad(ticket.getPrioridad().name());
             dto.setTicketSeveridad(ticket.getSeveridad().name());

@@ -5,7 +5,9 @@ import java.util.List;
 
 public class TicketResponseDTO {
     
-    private Long id;
+    private Long id;  // Tu ID interno
+    private String ticketExternoId;  // Su internalId
+    private String codigo;  // Su código SAP-1
     private String nombre;
     private String prioridad;
     private String severidad;
@@ -28,6 +30,12 @@ public class TicketResponseDTO {
     // GETTERS Y SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
+    public String getTicketExternoId() { return ticketExternoId; }
+    public void setTicketExternoId(String ticketExternoId) { this.ticketExternoId = ticketExternoId; }
+    
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
     
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

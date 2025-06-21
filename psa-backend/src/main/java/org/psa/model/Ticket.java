@@ -27,6 +27,19 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "ticket_externo_id")
+    private String ticketExternoId;  // El internalId de soporte
+
+    @Column(name = "codigo")
+    private String codigo;  // El código SAP-1, etc.
+
+    // Getters y setters:
+    public String getTicketExternoId() { return ticketExternoId; }
+    public void setTicketExternoId(String ticketExternoId) { this.ticketExternoId = ticketExternoId; }
+
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
+
     @Column(nullable = false)
     private String nombre;
     
@@ -116,7 +129,7 @@ public class Ticket {
     public void setTareasAsignadas(List<Tarea> tareasAsignadas) { this.tareasAsignadas = tareasAsignadas; }
     
     // MÉTODOS ÚTILES
-    public boolean tieneTagreasAsignadas() {
+    public boolean tieneTareasAsignadas() {
         return tareasAsignadas != null && !tareasAsignadas.isEmpty();
     }
     
