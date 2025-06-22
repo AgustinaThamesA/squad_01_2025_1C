@@ -19,15 +19,15 @@ public class US01VisualizacionProyectosSteps {
 
     @Given("existen proyectos cargados en el sistema")
     public void existenProyectosCargadosEnElSistema() {
-        Proyecto proyecto1 = new Proyecto("PSA Cloud Spring ERP", "Migración del ERP principal a cloud", "Leonardo Felici");
+        Proyecto proyecto1 = new Proyecto("PSA Cloud Spring ERP", "Migración del ERP principal a cloud", (String) "Leonardo Felici");
         proyecto1.planificarFechas(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 6, 30));
         proyecto1.setEstado(Estado.ACTIVO);
 
-        Proyecto proyecto2 = new Proyecto("CRM Mobile Release v2.1", "Funcionalidades móviles del CRM", "Leonardo Felici");
+        Proyecto proyecto2 = new Proyecto("CRM Mobile Release v2.1", "Funcionalidades móviles del CRM", (String) "Leonardo Felici");
         proyecto2.planificarFechas(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 7, 15));
         proyecto2.setEstado(Estado.CERRADO);
 
-        Proyecto proyecto3 = new Proyecto("Business Analytics v3.0", "Versión renovada de módulo de BI", "Leonardo Felici");
+        Proyecto proyecto3 = new Proyecto("Business Analytics v3.0", "Versión renovada de módulo de BI", (String) "Leonardo Felici");
         proyecto3.planificarFechas(LocalDate.of(2024, 3, 10), null); // Sin fecha fin
         proyecto3.setEstado(Estado.ACTIVO);
 
@@ -40,7 +40,7 @@ public class US01VisualizacionProyectosSteps {
     @Given("no existen proyectos activos en el sistema")
     public void noExistenProyectosActivos() {
         proyectos.clear();
-        Proyecto cerrado1 = new Proyecto("Migración Legacy", "Actualización de plataformas", "Carla Ramírez");
+        Proyecto cerrado1 = new Proyecto("Migración Legacy", "Actualización de plataformas", (String) "Carla Ramírez");
         cerrado1.planificarFechas(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 6, 1));
         cerrado1.setEstado(Estado.CERRADO);
 
@@ -50,11 +50,11 @@ public class US01VisualizacionProyectosSteps {
     @Given("existen proyectos en estado cerrado")
     public void existenProyectosEnEstadoCerrado() {
         proyectos.clear();
-        Proyecto cerrado1 = new Proyecto("Refactor Backoffice", "Refactor de servicios internos", "Martín López");
+        Proyecto cerrado1 = new Proyecto("Refactor Backoffice", "Refactor de servicios internos", (String) "Martín López");
         cerrado1.planificarFechas(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 4, 1));
         cerrado1.setEstado(Estado.CERRADO);
 
-        Proyecto cerrado2 = new Proyecto("Infra upgrade", "Actualización de infraestructura", "Paula García");
+        Proyecto cerrado2 = new Proyecto("Infra upgrade", "Actualización de infraestructura", (String) "Paula García");
         cerrado2.planificarFechas(LocalDate.of(2024, 2, 10), LocalDate.of(2024, 5, 10));
         cerrado2.setEstado(Estado.CERRADO);
 
@@ -65,7 +65,7 @@ public class US01VisualizacionProyectosSteps {
     @Given("existe un proyecto sin fechas de finalización o sin líder asignado")
     public void proyectoSinDatosCompletos() {
         proyectos.clear();
-        Proyecto incompleto = new Proyecto("Core DevTools", "Herramientas internas", null);
+        Proyecto incompleto = new Proyecto("Core DevTools", "Herramientas internas", (String) null);
         incompleto.planificarFechas(LocalDate.of(2024, 5, 1), null); // Fecha fin null
         incompleto.setEstado(Estado.ACTIVO);
 
