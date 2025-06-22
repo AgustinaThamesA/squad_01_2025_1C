@@ -3,11 +3,10 @@ package org.psa.Steps;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.psa.service.ProyectoService;
+import org.junit.jupiter.api.Assertions;
 import org.psa.model.Proyecto;
 import org.psa.model.Riesgo;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.psa.service.ProyectoService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,13 +17,15 @@ public class US04GestionRiesgosSteps {
     private Proyecto proyecto;
     private Riesgo riesgo;
     private boolean permisoDenegado;
+    private boolean esGerente;
 
     @Given("que soy gerente de proyecto de un proyecto activo")
     public void soyGerenteDeProyectoDeUnProyectoActivo() {
-        gerente = new ProyectoService();
+        gerente = new ProyectoService(); // Simulación
         proyecto = new Proyecto("Proyecto X", "Descripción del proyecto", "Leonardo Felici");
         proyecto.setEstado(Proyecto.Estado.ACTIVO);
         permisoDenegado = false;
+        esGerente = true;
     }
 
     @When("registro un riesgo con su descripción, impacto y probabilidad")
@@ -35,9 +36,9 @@ public class US04GestionRiesgosSteps {
 
     @Then("el sistema lo almacena y lo clasifica automáticamente según severidad")
     public void sistemaAlmacenaYClasifica() {
-        assertTrue(proyecto.getRiesgos().contains(riesgo));
-        int nivelRiesgo = riesgo.calcularNivelRiesgo();
-        assertTrue(nivelRiesgo >= 1 && nivelRiesgo <= 9);
+        Assertions.assertTrue(proyecto.getRiesgos().contains(riesgo));
+        int severidad = riesgo.calcularNivelRiesgo();
+        Assertions.assertTrue(severidad >= 1 && severidad <= 9);
     }
 
     @Given("que existe un riesgo registrado")
@@ -48,9 +49,6 @@ public class US04GestionRiesgosSteps {
 
     @When("asigno un plan de mitigación con su responsable")
     public void asignoPlanMitigacion() {
-        // No existe el método real, simulamos asignación con una propiedad local
-        // Podrías agregar un Map o un atributo en Riesgo si querés
-        // Por ahora guardamos en un String simulado
         riesgo.setDescripcion(riesgo.getDescripcion() + " [Plan Mitigación asignado]");
     }
 
@@ -61,8 +59,8 @@ public class US04GestionRiesgosSteps {
 
     @Then("ambos planes quedan asociados correctamente al riesgo")
     public void planesAsociadosCorrectamente() {
-        assertTrue(riesgo.getDescripcion().contains("Plan Mitigación"));
-        assertTrue(riesgo.getDescripcion().contains("Plan Contingencia"));
+        Assertions.assertTrue(riesgo.getDescripcion().contains("Plan Mitigación"));
+        Assertions.assertTrue(riesgo.getDescripcion().contains("Plan Contingencia"));
     }
 
     @Given("que el proyecto tiene múltiples riesgos registrados")
@@ -75,41 +73,40 @@ public class US04GestionRiesgosSteps {
 
     @When("accedo a la sección de riesgos")
     public void accedoSeccionRiesgos() {
-        // Simulamos ordenamiento por severidad (nivel riesgo descendente)
-        List<Riesgo> riesgosOrdenados = proyecto.getRiesgos().stream()
+        List<Riesgo> ordenados = proyecto.getRiesgos().stream()
                 .sorted((r1, r2) -> Integer.compare(r2.calcularNivelRiesgo(), r1.calcularNivelRiesgo()))
                 .collect(Collectors.toList());
+
         proyecto.getRiesgos().clear();
-        proyecto.getRiesgos().addAll(riesgosOrdenados);
+        proyecto.getRiesgos().addAll(ordenados);
     }
 
     @Then("los veo ordenados por severidad de mayor a menor")
     public void veoRiesgosOrdenados() {
         List<Riesgo> riesgos = proyecto.getRiesgos();
-        for (int i = 0; i < riesgos.size() - 1; i = i + 1) {
-            assertTrue(riesgos.get(i).calcularNivelRiesgo() >= riesgos.get(i + 1).calcularNivelRiesgo());
+        for (int i = 0; i < riesgos.size() - 1; i++) {
+            Assertions.assertTrue(
+                riesgos.get(i).calcularNivelRiesgo() >= riesgos.get(i + 1).calcularNivelRiesgo(),
+                "Los riesgos no están ordenados correctamente"
+            );
         }
     }
 
     @Given("que soy un usuario sin rol de gerente de proyecto")
     public void usuarioSinRolGerente() {
-        gerente = null; // No es gerente
-        permisoDenegado = false;
+        gerente = null;
+        esGerente = false;
         proyecto = new Proyecto("Proyecto X", "Descripción", "otroUsuario");
         proyecto.setEstado(Proyecto.Estado.ACTIVO);
     }
 
     @When("intento registrar o editar un riesgo")
     public void intentoRegistrarEditarRiesgo() {
-        if (gerente == null) {
-            permisoDenegado = true;
-        } else {
-            permisoDenegado = false;
-        }
+        permisoDenegado = !esGerente;
     }
 
     @Then("el sistema me impide realizar la acción y muestra un mensaje de error")
     public void sistemaImpideAccion() {
-        assertTrue(permisoDenegado);
+        Assertions.assertTrue(permisoDenegado, "El sistema debería impedir la acción");
     }
 }

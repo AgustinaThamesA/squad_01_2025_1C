@@ -3,14 +3,12 @@ package org.psa.Steps;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
-import org.psa.service.ProyectoService;
 import org.psa.model.Fase;
 import org.psa.model.Proyecto;
 import org.junit.Assert;
 
 public class US02GestionEtapasSteps {
 
-    private ProyectoService proyectoService;
     private Proyecto proyecto;
     private Fase faseActual;
     private String etapaActual;
@@ -18,17 +16,16 @@ public class US02GestionEtapasSteps {
     private boolean operacionExitosa;
 
     public US02GestionEtapasSteps() {
-        this.proyectoService = new ProyectoService();
         this.proyecto = new Proyecto("Proyecto Test", "Descripción de prueba", "Juan Pérez");
 
-        // Defino TODAS las etapas en orden para que estén todas en la lista y no falle
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Inicio");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Análisis");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Diseño");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Desarrollo");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Testing");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Despliegue");
-        proyectoService.crearFase(proyecto.getIdProyecto(), "Transición");
+        // Creamos fases manualmente con orden
+        proyecto.agregarFase(new Fase("Inicio", 1));
+        proyecto.agregarFase(new Fase("Análisis", 2));
+        proyecto.agregarFase(new Fase("Diseño", 3));
+        proyecto.agregarFase(new Fase("Desarrollo", 4));
+        proyecto.agregarFase(new Fase("Testing", 5));
+        proyecto.agregarFase(new Fase("Despliegue", 6));
+        proyecto.agregarFase(new Fase("Transición", 7));
     }
 
     @Given("que el proyecto está en etapa {string}")
@@ -42,60 +39,38 @@ public class US02GestionEtapasSteps {
 
     @When("marco la etapa como {string}")
     public void marcoLaEtapaComo(String nuevaEtapa) {
-        this.operacionExitosa = false;
-        this.mensajeError = null;
-
-        Fase nuevaFase = proyecto.getFases().stream()
-                .filter(f -> f.getNombre().equalsIgnoreCase(nuevaEtapa))
-                .findFirst()
-                .orElse(null);
-
-        if (nuevaFase == null) {
-            this.mensajeError = "Etapa no encontrada: " + nuevaEtapa;
-            return;
-        }
-
-        // Solo permite avanzar una etapa a la vez (orden secuencial)
-        if (nuevaFase.getOrden() == faseActual.getOrden() + 1) {
-            this.faseActual = nuevaFase;
-            this.etapaActual = nuevaEtapa;
-            this.operacionExitosa = true;
-            this.mensajeError = null;
-        } else {
-            this.operacionExitosa = false;
-            this.mensajeError = "No se puede avanzar a la etapa " + nuevaEtapa
-                    + ". Debe completarse la etapa previa primero.";
-        }
+        cambiarEtapa(nuevaEtapa);
     }
 
     @When("intento cambiar directamente a {string}")
     public void intentoCambiarDirectamenteA(String etapaDestino) {
+        cambiarEtapa(etapaDestino);
+    }
+
+    private void cambiarEtapa(String destino) {
         this.operacionExitosa = false;
         this.mensajeError = null;
 
-        Fase etapaDestinoFase = proyecto.getFases().stream()
-                .filter(f -> f.getNombre().equalsIgnoreCase(etapaDestino))
+        Fase nuevaFase = proyecto.getFases().stream()
+                .filter(f -> f.getNombre().equalsIgnoreCase(destino))
                 .findFirst()
                 .orElse(null);
 
-        if (etapaDestinoFase == null) {
-            this.mensajeError = "Etapa de destino no encontrada: " + etapaDestino;
+        if (nuevaFase == null) {
+            this.mensajeError = "Etapa no encontrada: " + destino;
             return;
         }
 
-        int diferenciaOrden = etapaDestinoFase.getOrden() - faseActual.getOrden();
+        int diferenciaOrden = nuevaFase.getOrden() - faseActual.getOrden();
 
-        if (diferenciaOrden > 1) {
-            this.operacionExitosa = false;
-            this.mensajeError = "No se pueden saltear etapas. Primero debe completarse la etapa actual.";
-        } else if (diferenciaOrden <= 0) {
-            this.operacionExitosa = false;
-            this.mensajeError = "No se puede retroceder o permanecer en la misma etapa.";
-        } else {
-            this.faseActual = etapaDestinoFase;
-            this.etapaActual = etapaDestino;
+        if (diferenciaOrden == 1) {
+            this.faseActual = nuevaFase;
+            this.etapaActual = destino;
             this.operacionExitosa = true;
-            this.mensajeError = null;
+        } else if (diferenciaOrden > 1) {
+            this.mensajeError = "No se pueden saltear etapas. Primero debe completarse la etapa actual.";
+        } else {
+            this.mensajeError = "No se puede retroceder o permanecer en la misma etapa.";
         }
     }
 
@@ -111,22 +86,15 @@ public class US02GestionEtapasSteps {
     public void elSistemaDebeMostrarUnErrorIndicandoQueNoSePuedeSaltearEtapas() {
         Assert.assertFalse("La operación no debería haber sido exitosa", operacionExitosa);
         Assert.assertNotNull("Debe haber un mensaje de error", mensajeError);
-        Assert.assertTrue(
-                "El mensaje debe indicar que no se pueden saltear etapas",
-                mensajeError.toLowerCase().contains("saltear etapas")
-                        || mensajeError.toLowerCase().contains("orden secuencial"));
+        Assert.assertTrue("El mensaje debe indicar que no se pueden saltear etapas",
+                mensajeError.toLowerCase().contains("saltear etapas"));
     }
 
-    // Getters útiles para debugging
-    public String getEtapaActual() {
-        return etapaActual;
-    }
-
-    public String getMensajeError() {
-        return mensajeError;
-    }
-
-    public boolean isOperacionExitosa() {
-        return operacionExitosa;
+    @Then("el sistema debe mostrar un error indicando que no se puede retroceder o permanecer en la misma etapa")
+    public void elSistemaDebeMostrarUnErrorIndicandoQueNoSePuedeRetroceder() {
+        Assert.assertFalse("La operación no debería haber sido exitosa", operacionExitosa);
+        Assert.assertNotNull("Debe haber un mensaje de error", mensajeError);
+        Assert.assertTrue("El mensaje debe indicar que no se puede retroceder o quedarse en la misma etapa",
+                mensajeError.toLowerCase().contains("retroceder") || mensajeError.toLowerCase().contains("misma etapa"));
     }
 }

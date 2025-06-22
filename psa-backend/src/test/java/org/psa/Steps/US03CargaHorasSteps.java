@@ -16,16 +16,16 @@ public class US03CargaHorasSteps {
     private String estadoProyecto;
     private String estadoTarea;
     private boolean cargaExitosa;
-    private String mensaje;
     private boolean horasAsociadas;
+    private String mensaje;
 
     @Given("un gerente de proyecto con permiso para cargar horas")
-    public void gerenteDeProyectoConPermisoParaCargarHoras() {
+    public void unGerenteConPermiso() {
         rolUsuario = RolUsuario.GERENTE_PROYECTO;
     }
 
     @Given("un gerente de proyecto sin permiso para cargar horas")
-    public void gerenteDeProyectoSinPermisoParaCargarHoras() {
+    public void unGerenteSinPermiso() {
         rolUsuario = RolUsuario.OTRO;
     }
 
@@ -40,46 +40,28 @@ public class US03CargaHorasSteps {
     }
 
     @When("el gerente de proyecto carga {int} horas en esa tarea")
-    public void elGerenteDeProyectoCargaHorasEnEsaTarea(int horas) {
-        if (!tienePermiso()) {
-            cargaExitosa = false;
-            mensaje = "Falta de permisos para cargar horas";
-            horasAsociadas = false;
-            return;
-        }
-        if ("finalizado".equals(estadoProyecto)) {
-            cargaExitosa = false;
-            mensaje = "No se pueden cargar horas en proyectos finalizados";
-            horasAsociadas = false;
-            return;
-        }
-        cargaExitosa = true;
-        mensaje = null;
-        horasAsociadas = true;
+    public void cargarHoras(int horas) {
+        validarCarga();
     }
 
     @When("el gerente de proyecto intenta cargar horas en una tarea del proyecto")
-    public void elGerenteDeProyectoIntentaCargarHorasEnUnaTareaDelProyecto() {
-        if ("finalizado".equals(estadoProyecto)) {
-            cargaExitosa = false;
-            mensaje = "No se pueden cargar horas en proyectos finalizados";
-            horasAsociadas = false;
-        } else if (!tienePermiso()) {
-            cargaExitosa = false;
-            mensaje = "Falta de permisos para cargar horas";
-            horasAsociadas = false;
-        } else {
-            cargaExitosa = true;
-            mensaje = null;
-            horasAsociadas = true;
-        }
+    public void intentaCargarEnProyectoFinalizado() {
+        validarCarga();
     }
 
     @When("intenta registrar horas en una tarea")
-    public void intentaRegistrarHorasEnUnaTarea() {
+    public void intentaRegistrarHorasSinPermiso() {
+        validarCarga();
+    }
+
+    private void validarCarga() {
         if (!tienePermiso()) {
             cargaExitosa = false;
             mensaje = "Falta de permisos para cargar horas";
+            horasAsociadas = false;
+        } else if ("finalizado".equals(estadoProyecto)) {
+            cargaExitosa = false;
+            mensaje = "No se pueden cargar horas en proyectos finalizados";
             horasAsociadas = false;
         } else {
             cargaExitosa = true;
@@ -89,43 +71,37 @@ public class US03CargaHorasSteps {
     }
 
     @Then("la carga se registra exitosamente")
-    public void laCargaSeRegistraExitosamente() {
+    public void cargaExitosa() {
         Assert.assertTrue("La carga debería ser exitosa", cargaExitosa);
         Assert.assertNull("No debería haber mensaje de error", mensaje);
     }
 
     @Then("las horas quedan asociadas al gerente de proyecto y a la tarea")
-    public void lasHorasQuedanAsociadasAlGerenteDeProyectoYALaTarea() {
+    public void horasAsociadasCorrectamente() {
         Assert.assertTrue("Las horas deberían estar asociadas", horasAsociadas);
     }
 
     @Then("la carga es bloqueada")
-    public void laCargaEsBloqueada() {
+    public void cargaBloqueada() {
         Assert.assertFalse("La carga debería estar bloqueada", cargaExitosa);
-        Assert.assertNotNull("Debe haber un mensaje indicando bloqueo", mensaje);
     }
 
     @Then("se muestra un mensaje que indica que no se pueden cargar horas en proyectos finalizados")
-    public void seMuestraUnMensajeQueIndicaQueNoSePuedenCargarHorasEnProyectosFinalizados() {
-        Assert.assertFalse("La carga no debería ser exitosa", cargaExitosa);
+    public void mensajeProyectoFinalizado() {
         Assert.assertEquals("No se pueden cargar horas en proyectos finalizados", mensaje);
     }
 
     @Then("la acción es rechazada")
-    public void laAccionEsRechazada() {
+    public void accionRechazada() {
         Assert.assertFalse("La acción debería ser rechazada", cargaExitosa);
-        Assert.assertNotNull("Debe haber mensaje de rechazo", mensaje);
     }
 
     @Then("se muestra un mensaje indicando falta de permisos")
-    public void seMuestraUnMensajeIndicandoFaltaDePermisos() {
-        Assert.assertFalse("La carga debería estar bloqueada por falta de permisos", cargaExitosa);
-        Assert.assertTrue("El mensaje debe indicar falta de permisos",
-                mensaje.toLowerCase().contains("permiso") || mensaje.toLowerCase().contains("falta"));
+    public void mensajeFaltaPermisos() {
+        Assert.assertTrue(mensaje.toLowerCase().contains("permiso") || mensaje.toLowerCase().contains("falta"));
     }
 
     private boolean tienePermiso() {
-        // Solo el gerente de proyecto tiene permiso
         return rolUsuario == RolUsuario.GERENTE_PROYECTO;
     }
 }

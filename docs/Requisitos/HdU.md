@@ -13,6 +13,8 @@ Está organizado por historia de usuario (US) y cubre los siguientes aspectos cl
 - US-02 – Etapas del Proyecto
 - US-03 – Gestión de Carga de Horas
 - US-04 – Gestión de Riesgos del Proyecto
+- US-05 - Gestión de configuración del software por cliente
+- US-06 - Clasificación de proyectos por tipo
 
 Cada historia está vinculada con su issue del backlog, criterios de aceptación, tareas técnicas y escenarios de prueba en lenguaje Gherkin.
 
